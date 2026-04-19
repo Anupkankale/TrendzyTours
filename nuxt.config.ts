@@ -69,9 +69,6 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    brevoApiKey: process.env.BREVO_API_KEY ?? "",
-    brevoListId: process.env.BREVO_LIST_ID ?? "",
-    jwtSecret: process.env.JWT_SECRET ?? "change-me-in-production",
     public: {
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL ?? "https://trendzytours.com",
       whatsappNumber: process.env.WHATSAPP_NUMBER ?? "917123578454",
@@ -79,10 +76,10 @@ export default defineNuxtConfig({
   },
 
   nitro: {
-    storage: {
-      leads: {
-        driver: "fs",
-        base: "./.data/leads",
+    devProxy: {
+      "/api": {
+        target: (process.env.NUXT_PUBLIC_API_BASE ?? "http://localhost:8888") + "/api",
+        changeOrigin: true,
       },
     },
   },

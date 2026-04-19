@@ -2,6 +2,7 @@ import { defineStore } from "pinia"
 import type { Lead, LeadStatus } from "@/types/lead"
 
 export const useLeadsStore = defineStore("leads", () => {
+  const { apiFetch } = useApi()
   const leads = ref<Lead[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
@@ -10,7 +11,7 @@ export const useLeadsStore = defineStore("leads", () => {
     loading.value = true
     error.value = null
     try {
-      leads.value = await $fetch<Lead[]>("/api/leads")
+      leads.value = await apiFetch<Lead[]>("/api/leads")
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : "Failed to load leads"
     } finally {
@@ -20,14 +21,14 @@ export const useLeadsStore = defineStore("leads", () => {
 
   async function fetchLead(id: string): Promise<Lead | null> {
     try {
-      return await $fetch<Lead>(`/api/leads/${id}`)
+      return await apiFetch<Lead>(`/api/leads/${id}`)
     } catch {
       return null
     }
   }
 
   async function updateStatus(id: string, status: LeadStatus) {
-    const lead = await $fetch<Lead>(`/api/leads/${id}`, {
+    const lead = await apiFetch<Lead>(`/api/leads/${id}`, {
       method: "PUT",
       body: { status },
     })
@@ -37,7 +38,7 @@ export const useLeadsStore = defineStore("leads", () => {
   }
 
   async function addNote(id: string, note: string) {
-    const lead = await $fetch<Lead>(`/api/leads/${id}`, {
+    const lead = await apiFetch<Lead>(`/api/leads/${id}`, {
       method: "PUT",
       body: { note },
     })
@@ -49,7 +50,7 @@ export const useLeadsStore = defineStore("leads", () => {
   async function createManualLead(data: {
     name: string; email: string; phone: string; tourInterest?: string; message: string
   }) {
-    const lead = await $fetch<Lead>("/api/leads", { method: "POST", body: data })
+    const lead = await apiFetch<Lead>("/api/leads", { method: "POST", body: data })
     leads.value.unshift(lead)
     return lead
   }

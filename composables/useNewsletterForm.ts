@@ -5,6 +5,7 @@ const schema = z.object({
 })
 
 export function useNewsletterForm() {
+  const { apiFetch } = useApi()
   const email = ref("")
   const isSubmitting = ref(false)
   const isSuccess = ref(false)
@@ -19,7 +20,7 @@ export function useNewsletterForm() {
     isSubmitting.value = true
     error.value = null
     try {
-      await $fetch("/api/newsletter", { method: "POST", body: { email: email.value } })
+      await apiFetch("/api/newsletter", { method: "POST", body: { email: email.value } })
       isSuccess.value = true
       email.value = ""
     } catch {

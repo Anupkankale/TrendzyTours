@@ -1,0 +1,12 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Destination extends Model
+{
+    protected $fillable = ['name', 'slug', 'image', 'country_count', 'description', 'featured_countries'];
+
+    protected $casts = ['featured_countries' => 'array'];
+}

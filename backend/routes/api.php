@@ -1,0 +1,27 @@
+<?php
+
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\LeadController;
+use App\Http\Controllers\NewsletterController;
+use App\Http\Controllers\TourController;
+use Illuminate\Support\Facades\Route;
+
+// Public routes
+Route::get('/tours', [TourController::class, 'index']);
+Route::get('/tours/{slug}', [TourController::class, 'show']);
+Route::post('/contact', [ContactController::class, 'store']);
+Route::post('/newsletter', [NewsletterController::class, 'subscribe']);
+
+// Auth
+Route::post('/auth/login', [AuthController::class, 'login']);
+Route::post('/auth/logout', [AuthController::class, 'logout']);
+Route::get('/auth/me', [AuthController::class, 'me'])->middleware('auth:api');
+
+// Leads — admin and sales only
+Route::middleware(['auth:api', 'role:admin,sales'])->group(function () {
+    Route::get('/leads', [LeadController::class, 'index']);
+    Route::post('/leads', [LeadController::class, 'store']);
+    Route::get('/leads/{id}', [LeadController::class, 'show']);
+    Route::put('/leads/{id}', [LeadController::class, 'update']);
+});

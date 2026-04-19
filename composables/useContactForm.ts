@@ -13,6 +13,7 @@ const schema = z.object({
 export type ContactFormValues = z.infer<typeof schema>
 
 export function useContactForm() {
+  const { apiFetch } = useApi()
   const isSubmitting = ref(false)
   const isSuccess = ref(false)
   const serverError = ref<string | null>(null)
@@ -31,7 +32,7 @@ export function useContactForm() {
     isSubmitting.value = true
     serverError.value = null
     try {
-      await $fetch("/api/contact", { method: "POST", body: values })
+      await apiFetch("/api/contact", { method: "POST", body: values })
       isSuccess.value = true
       resetForm()
     } catch (err: unknown) {

@@ -2,6 +2,7 @@ import { defineStore } from "pinia"
 import type { User, Role } from "@/types/auth"
 
 export const useAuthStore = defineStore("auth", () => {
+  const { apiFetch } = useApi()
   const user = ref<User | null>(null)
   const isLoading = ref(false)
 
@@ -15,7 +16,7 @@ export const useAuthStore = defineStore("auth", () => {
   async function login(email: string, password: string) {
     isLoading.value = true
     try {
-      const data = await $fetch<{ user: User }>("/api/auth/login", {
+      const data = await apiFetch<{ user: User }>("/api/auth/login", {
         method: "POST",
         body: { email, password },
       })
@@ -26,13 +27,13 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   async function logout() {
-    await $fetch("/api/auth/logout", { method: "POST" })
+    await apiFetch("/api/auth/logout", { method: "POST" })
     user.value = null
   }
 
   async function fetchCurrentUser() {
     try {
-      const data = await $fetch<{ user: User }>("/api/auth/me")
+      const data = await apiFetch<{ user: User }>("/api/auth/me")
       user.value = data.user
     } catch {
       user.value = null
