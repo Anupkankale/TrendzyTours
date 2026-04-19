@@ -1,0 +1,48 @@
+# Trendzy Tours — Cursor AI Context
+
+## Project
+Travel agency website. Domain: trendzytours.com. Nagpur, India.
+Nuxt 3.21.2 + TypeScript. Iteration 1 (public site) complete. Iteration 2 (dashboard) in progress.
+
+## Stack
+- Nuxt 3 + TypeScript + Vite
+- Tailwind CSS 3 — gold/dark/cream palette; Playfair Display (headings), Inter (body)
+- Pinia state: stores/auth.ts, stores/tours.ts, stores/ui.ts
+- @nuxt/content — blog markdown in content/blog/
+- @nuxt/image — use <NuxtImg> / <NuxtPicture>, not <img>
+- @nuxt/icon + @heroicons/vue
+- @headlessui/vue for accessible UI primitives
+- vee-validate + zod — all forms use these two together
+- jose — JWT auth, server-side only
+- Brevo — email and newsletter
+- @nuxtjs/sitemap (NOT @nuxtjs/seo — removed, incompatible with Nuxt 3.21)
+
+## Folder Conventions
+- pages/ → Nuxt file-based routing
+- components/global/ → TheHeader, TheFooter, TheMobileMenu
+- components/home/ → page section components
+- components/tours/ → TourCard, TourGrid
+- components/dashboard/ → DashHeader, DashSidebar
+- components/ui/ → AppButton, AppBadge, AppSectionTitle (reuse these)
+- composables/ → useContactForm, useNewsletterForm, useTours
+- middleware/ → auth.ts (JWT guard), role.ts (RBAC: admin/sales/customer/seo)
+- data/ → static seed data (no CMS)
+- server/api/ → Nitro API routes
+
+## Coding Rules
+- Always use TypeScript with strict types
+- Use <script setup lang="ts"> in all SFCs
+- Use <NuxtImg> / <NuxtPicture> for all images — never raw <img>
+- Use AppButton, AppBadge, AppSectionTitle from components/ui/ — don't recreate
+- Mobile-first Tailwind classes (sm: md: lg:)
+- Forms: vee-validate + zod schema, never manual validation
+- Don't add @nuxtjs/seo or nuxt-og-image — they break Nuxt 3.21
+- Dashboard pages must have definePageMeta({ middleware: ['auth', 'role'] })
+- routeRules: prerender static, isr dynamic, ssr:false dashboard
+
+## API Endpoints (already exist, don't duplicate)
+- GET /api/tours — all tours
+- GET /api/tours/[slug] — single tour
+- POST /api/contact — contact form
+- POST /api/newsletter — newsletter
+- POST /api/auth/login | GET /api/auth/me | POST /api/auth/logout

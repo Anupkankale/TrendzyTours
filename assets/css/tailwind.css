@@ -1,0 +1,297 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   DESIGN TOKENS — single source of truth
+   Change a value here → it updates UNIVERSALLY across the site
+   ============================================================ */
+:root {
+
+  /* ── Brand colour ─────────────────────────────────────────
+     This is the primary accent colour used for buttons,
+     links, icons, and highlights everywhere.              */
+  --color-brand:       #1E6C93;
+  --color-brand-dark:  #134c68;
+  --color-brand-light: #459aca;
+
+  /* ── Text colours ─────────────────────────────────────────
+     Change --color-heading → ALL h1 h2 h3 h4 change.
+     Change --color-body    → ALL p tags change.
+     Change --color-muted   → ALL secondary text changes.  */
+  --color-heading:  #092d3e;   /* h1, h2, h3, h4            */
+  --color-body:     #3c404b;   /* p, li, default text       */
+  --color-muted:    #5d6270;   /* captions, descriptions    */
+  --color-subtle:   #9da1ab;   /* placeholders, dividers    */
+  --color-accent:   #1E6C93;   /* links, active states      */
+  --color-on-brand: #ffffff;   /* text ON brand-colour bg   */
+
+  /* ── Font sizes (pixel-perfect) ──────────────────────────
+     Change --text-h1 → every h1 on every page updates.   */
+  --text-display:  clamp(48px, 6vw, 80px);   /* hero titles          */
+  --text-h1:       clamp(36px, 4.5vw, 64px); /* page h1              */
+  --text-h2:       clamp(28px, 3.2vw, 40px); /* section headings     */
+  --text-h3:       clamp(20px, 2.2vw, 28px); /* card / sub headings  */
+  --text-h4:       22px;                     /* small headings       */
+  --text-h5:       18px;                     /* labels, nav          */
+  --text-h6:       16px;                     /* micro headings       */
+  --text-body-lg:  18px;                     /* lead paragraphs      */
+  --text-body:     16px;                     /* all body text        */
+  --text-body-sm:  14px;                     /* secondary body       */
+  --text-caption:  12px;                     /* captions, badges     */
+
+  /* ── Line heights ─────────────────────────────────────────*/
+  --leading-display: 1.1;
+  --leading-heading: 1.2;
+  --leading-subhead: 1.35;
+  --leading-body:    1.75;
+  --leading-tight:   1.4;
+
+  /* ── Font weights ─────────────────────────────────────────*/
+  --weight-heading: 700;
+  --weight-subhead: 600;
+  --weight-body:    400;
+  --weight-medium:  500;
+
+  /* ── Spacing & layout ─────────────────────────────────────
+     Change --section-y → all section top/bottom padding updates. */
+  --section-y:  96px;
+  --section-x:  32px;
+  --card-pad:   24px;
+  --gap-grid:   24px;
+  --radius-card:  16px;
+  --radius-btn:   9999px;
+
+  /* ── Responsive overrides ─────────────────────────────────*/
+  @media (max-width: 1024px) {
+    --section-y: 72px;
+    --section-x: 24px;
+    --card-pad:  20px;
+  }
+
+  @media (max-width: 640px) {
+    --section-y: 56px;
+    --section-x: 16px;
+    --card-pad:  16px;
+  }
+}
+
+
+/* ============================================================
+   BASE ELEMENT STYLES
+   Edit these to change how tags look everywhere on the site.
+   ============================================================ */
+@layer base {
+
+  /* ── Document ─────────────────────────────────────────────*/
+  html {
+    font-family: theme("fontFamily.body");
+    font-size: var(--text-body);
+    color: var(--color-body);
+    @apply antialiased scroll-smooth;
+  }
+
+  body {
+    background-color: #ffffff;
+    background-image:
+      radial-gradient(ellipse at 15% 50%, rgba(30, 108, 147, 0.09) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 15%, rgba(30, 108, 147, 0.07) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 100%, rgba(30, 108, 147, 0.05) 0%, transparent 60%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    line-height: var(--leading-body);
+  }
+
+  /* ── Headings ─────────────────────────────────────────────
+     Change --color-heading in :root to update ALL headings. */
+  h1 {
+    font-family: theme("fontFamily.heading");
+    font-size: var(--text-h1);
+    font-weight: var(--weight-heading);
+    line-height: var(--leading-heading);
+    letter-spacing: -0.02em;
+    color: var(--color-heading);
+  }
+
+  h2 {
+    font-family: theme("fontFamily.heading");
+    font-size: var(--text-h2);
+    font-weight: var(--weight-heading);
+    line-height: var(--leading-heading);
+    letter-spacing: -0.015em;
+    color: var(--color-heading);
+  }
+
+  h3 {
+    font-family: theme("fontFamily.heading");
+    font-size: var(--text-h3);
+    font-weight: var(--weight-subhead);
+    line-height: var(--leading-subhead);
+    letter-spacing: -0.01em;
+    color: var(--color-heading);
+  }
+
+  h4 {
+    font-family: theme("fontFamily.heading");
+    font-size: var(--text-h4);
+    font-weight: var(--weight-subhead);
+    line-height: var(--leading-subhead);
+    color: var(--color-heading);
+  }
+
+  h5 {
+    font-family: theme("fontFamily.body");
+    font-size: var(--text-h5);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-body);
+    color: var(--color-heading);
+  }
+
+  h6 {
+    font-family: theme("fontFamily.body");
+    font-size: var(--text-h6);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-body);
+    color: var(--color-muted);
+  }
+
+  /* ── Body text ────────────────────────────────────────────
+     Change --color-body in :root to update ALL p tags.    */
+  p {
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    color: var(--color-body);
+  }
+
+  /* ── Links ────────────────────────────────────────────────*/
+  a {
+    color: var(--color-accent);
+    text-decoration: none;
+    transition: color 150ms ease;
+  }
+  a:hover {
+    color: var(--color-brand-dark);
+  }
+
+  /* ── Lists ────────────────────────────────────────────────*/
+  ul, ol {
+    color: var(--color-body);
+    line-height: var(--leading-body);
+  }
+
+  /* ── Small / caption ──────────────────────────────────────*/
+  small, .text-caption {
+    font-size: var(--text-caption);
+    color: var(--color-muted);
+    line-height: var(--leading-tight);
+  }
+
+  /* ── Strong / em ──────────────────────────────────────────*/
+  strong, b { font-weight: var(--weight-subhead); }
+  em        { font-style: italic; }
+
+  /* ── Form elements ────────────────────────────────────────*/
+  input, textarea, select {
+    font-family: theme("fontFamily.body");
+    font-size: var(--text-body);
+    color: var(--color-heading);
+  }
+  input::placeholder, textarea::placeholder {
+    color: var(--color-subtle);
+  }
+}
+
+
+/* ============================================================
+   LAYOUT UTILITIES
+   ============================================================ */
+@layer components {
+
+  /* Section wrapper — uses token spacing */
+  .section-padding {
+    padding-top:    var(--section-y);
+    padding-bottom: var(--section-y);
+    padding-left:   var(--section-x);
+    padding-right:  var(--section-x);
+  }
+
+  .container-max {
+    @apply mx-auto max-w-7xl;
+    padding-left:  var(--section-x);
+    padding-right: var(--section-x);
+  }
+
+  /* ── Liquid glass variants ──────────────────────────────── */
+  .glass {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(16px) saturate(1.8);
+    -webkit-backdrop-filter: blur(16px) saturate(1.8);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(20px) saturate(2);
+    -webkit-backdrop-filter: blur(20px) saturate(2);
+    border: 1px solid rgba(255, 255, 255, 0.80);
+    box-shadow:
+      0 8px 32px rgba(30, 108, 147, 0.09),
+      0 2px 8px rgba(0, 0, 0, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    transition: background 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+  }
+  .glass-card:hover {
+    background: rgba(255, 255, 255, 0.80);
+    box-shadow:
+      0 20px 60px rgba(30, 108, 147, 0.13),
+      0 4px 16px rgba(0, 0, 0, 0.07),
+      inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    transform: translateY(-2px);
+  }
+
+  .glass-nav {
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(24px) saturate(2);
+    -webkit-backdrop-filter: blur(24px) saturate(2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow: 0 1px 24px rgba(30, 108, 147, 0.09), 0 1px 4px rgba(0, 0, 0, 0.04);
+  }
+
+  .glass-dropdown {
+    background: rgba(255, 255, 255, 0.90);
+    backdrop-filter: blur(24px) saturate(2);
+    -webkit-backdrop-filter: blur(24px) saturate(2);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    box-shadow:
+      0 20px 60px rgba(30, 108, 147, 0.12),
+      0 4px 16px rgba(0, 0, 0, 0.08);
+  }
+
+  .glass-hero {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(8px) saturate(1.5);
+    -webkit-backdrop-filter: blur(8px) saturate(1.5);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+  }
+
+  /* ── Smooth page transitions ─────────────────────────────── */
+  * { box-sizing: border-box; }
+
+  img, video { display: block; max-width: 100%; }
+
+  /* Reduce motion for accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Focus ring — visible only on keyboard nav */
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+  :focus:not(:focus-visible) { outline: none; }
+}
