@@ -11,9 +11,10 @@ const {
   name, nameProps, email, emailProps, phone, phoneProps,
   tourInterest, tourInterestProps, message, messageProps,
   errors, isSubmitting, isSuccess, serverError, submit,
-  otpCode, otpSending, otpSent, otpVerifying, emailVerified,
-  otpError, otpCooldown, sendOtp, verifyOtp,
+  linkSending, linkSent, emailVerified, verifyError, sendVerificationLink, devBypass,
 } = useContactForm()
+
+const isDev = import.meta.dev
 </script>
 
 <template>
@@ -98,7 +99,7 @@ const {
               </div>
             </div>
 
-            <!-- Email with OTP verification -->
+            <!-- Email with Firebase verification -->
             <div>
               <label class="mb-1 block text-sm font-medium text-dark-900">Email *</label>
               <div class="flex gap-2">
@@ -112,10 +113,10 @@ const {
                 <button
                   v-if="!emailVerified"
                   type="button"
-                  :disabled="otpSending || otpCooldown > 0"
+                  :disabled="linkSending || linkSent"
                   class="flex-shrink-0 rounded-lg bg-dark-900 px-3 py-2.5 text-xs font-semibold text-white transition hover:bg-dark-800 disabled:opacity-50"
-                  @click="sendOtp">
-                  {{ otpSending ? "Sending…" : otpCooldown > 0 ? `Resend (${otpCooldown}s)` : otpSent ? "Resend" : "Send OTP" }}
+                  @click="sendVerificationLink">
+                  {{ linkSending ? "Sending…" : linkSent ? "Link Sent" : "Verify Email" }}
                 </button>
                 <span v-else class="flex flex-shrink-0 items-center gap-1 text-sm font-medium text-green-600">
                   <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
@@ -123,28 +124,14 @@ const {
                 </span>
               </div>
               <p v-if="errors.email" class="mt-1 text-xs text-red-500">{{ errors.email }}</p>
-
-              <!-- OTP input -->
-              <div v-if="otpSent && !emailVerified" class="mt-3">
-                <label class="mb-1 block text-xs font-medium text-dark-900">Enter the 6-digit code sent to your email</label>
-                <div class="flex gap-2">
-                  <input
-                    v-model="otpCode"
-                    type="text"
-                    inputmode="numeric"
-                    maxlength="6"
-                    placeholder="6-digit OTP"
-                    class="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm tracking-widest focus:border-gold-500 focus:outline-none focus:ring-2 focus:ring-gold-200" />
-                  <button
-                    type="button"
-                    :disabled="otpVerifying"
-                    class="flex-shrink-0 rounded-lg bg-gold-500 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-gold-600 disabled:opacity-50"
-                    @click="verifyOtp">
-                    {{ otpVerifying ? "Verifying…" : "Verify" }}
-                  </button>
-                </div>
-                <p v-if="otpError" class="mt-1 text-xs text-red-500">{{ otpError }}</p>
-              </div>
+              <p v-if="linkSent && !emailVerified" class="mt-1 text-xs text-blue-600">
+                Check your inbox and click the verification link. This page will update automatically.
+              </p>
+              <p v-if="verifyError" class="mt-1 text-xs text-red-500">{{ verifyError }}</p>
+              <!-- Dev bypass — only visible in development -->
+              <button v-if="isDev && !emailVerified" type="button" class="mt-1 text-xs text-orange-500 underline" @click="devBypass">
+                [Dev] Skip verification
+              </button>
             </div>
 
             <div>
@@ -158,7 +145,7 @@ const {
             </div>
             <p v-if="serverError" class="text-sm text-red-500">{{ serverError }}</p>
             <p v-if="!emailVerified && !serverError" class="text-center text-xs text-gray-500">
-              Please verify your email address to submit.
+              Please verify your email address to submit the form.
             </p>
             <button
               type="submit"

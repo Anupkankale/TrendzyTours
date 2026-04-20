@@ -23,6 +23,7 @@
     "@tailwindcss/typography": "^0.5.16",
     "@vee-validate/zod": "^4.15.0",
     "autoprefixer": "^10.4.21",
+    "firebase": "^12.12.0",
     "jose": "^5.10.0",
     "nuxt": "^3.16.2",
     "pinia": "^3.0.1",

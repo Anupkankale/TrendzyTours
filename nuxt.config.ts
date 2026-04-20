@@ -72,6 +72,11 @@ export default defineNuxtConfig({
     public: {
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL ?? "https://trendzytours.com",
       whatsappNumber: process.env.WHATSAPP_NUMBER ?? "917123578454",
+      firebaseApiKey: process.env.NUXT_PUBLIC_FIREBASE_API_KEY ?? "",
+      firebaseAuthDomain: process.env.NUXT_PUBLIC_FIREBASE_AUTH_DOMAIN ?? "",
+      firebaseProjectId: process.env.NUXT_PUBLIC_FIREBASE_PROJECT_ID ?? "",
+      firebaseAppId: process.env.NUXT_PUBLIC_FIREBASE_APP_ID ?? "",
+      firebaseMessagingSenderId: process.env.NUXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? "",
     },
   },
 

@@ -1,4 +1,6 @@
 *.log
+/storage/firebase-service-account.json
+/storage/*.json
 .DS_Store
 .env
 .env.backup

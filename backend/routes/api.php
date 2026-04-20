@@ -4,13 +4,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\NewsletterController;
-use App\Http\Controllers\OtpController;
 use App\Http\Controllers\TourController;
 use Illuminate\Support\Facades\Route;
-
-// OTP verification
-Route::post('/otp/send', [OtpController::class, 'send']);
-Route::post('/otp/verify', [OtpController::class, 'verify']);
 
 // Public routes
 Route::get('/tours', [TourController::class, 'index']);

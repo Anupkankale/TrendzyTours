@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lead;
-use App\Models\OtpVerification;
+use App\Services\FirebaseService;
 use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,17 +21,25 @@ class ContactController extends Controller
             'message'      => 'required|string|min:10',
         ]);
 
-        $verified = OtpVerification::where('email_token', $data['emailToken'])
-            ->where('email', $data['email'])
-            ->whereNotNull('verified_at')
-            ->where('verified_at', '>=', now()->subMinutes(30))
-            ->exists();
+        // Dev bypass — only works in local environment
+        $isDevBypass = app()->environment('local') && $data['emailToken'] === 'dev-bypass';
 
-        if (!$verified) {
-            return response()->json([
-                'message' => 'Email not verified. Please verify your email with OTP first.',
-                'errors'  => ['emailToken' => ['Email verification required.']],
-            ], 422);
+        if (!$isDevBypass) {
+            try {
+                $verifiedEmail = (new FirebaseService())->verifyToken($data['emailToken']);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'message' => 'Email verification failed. Please verify your email and try again.',
+                    'errors'  => ['emailToken' => ['Invalid or expired verification token.']],
+                ], 422);
+            }
+
+            if (strtolower($verifiedEmail) !== strtolower($data['email'])) {
+                return response()->json([
+                    'message' => 'Email mismatch. Please verify the email you used in the form.',
+                    'errors'  => ['email' => ['Verified email does not match.']],
+                ], 422);
+            }
         }
 
         $lead = Lead::create([

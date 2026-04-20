@@ -1,6 +1,7 @@
 import { useForm } from "vee-validate"
 import { toTypedSchema } from "@vee-validate/zod"
 import { z } from "zod"
+import { sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from "firebase/auth"
 
 const schema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -14,34 +15,19 @@ export type ContactFormValues = z.infer<typeof schema>
 
 export function useContactForm() {
   const { apiFetch } = useApi()
+
   const isSubmitting = ref(false)
   const isSuccess = ref(false)
   const serverError = ref<string | null>(null)
 
-  // OTP state
-  const otpCode = ref("")
-  const otpSending = ref(false)
-  const otpSent = ref(false)
-  const otpVerifying = ref(false)
+  // Email verification state
+  const linkSending = ref(false)
+  const linkSent = ref(false)
   const emailVerified = ref(false)
   const emailToken = ref<string | null>(null)
-  const otpError = ref<string | null>(null)
-  const otpCooldown = ref(0)
+  const verifyError = ref<string | null>(null)
 
-  let cooldownTimer: ReturnType<typeof setInterval> | null = null
-
-  const startCooldown = () => {
-    otpCooldown.value = 30
-    cooldownTimer = setInterval(() => {
-      otpCooldown.value--
-      if (otpCooldown.value <= 0 && cooldownTimer) {
-        clearInterval(cooldownTimer)
-        cooldownTimer = null
-      }
-    }, 1000)
-  }
-
-  const { handleSubmit, errors, defineField, resetForm } = useForm({
+  const { handleSubmit, errors, defineField, resetForm, setFieldValue } = useForm({
     validationSchema: toTypedSchema(schema),
   })
 
@@ -51,54 +37,70 @@ export function useContactForm() {
   const [tourInterest, tourInterestProps] = defineField("tourInterest")
   const [message, messageProps] = defineField("message")
 
-  // Reset OTP when email changes
+  // Reset verification when email changes
   watch(email, () => {
     if (emailVerified.value) {
       emailVerified.value = false
       emailToken.value = null
-      otpSent.value = false
-      otpCode.value = ""
-      otpError.value = null
+      linkSent.value = false
+      verifyError.value = null
     }
   })
 
-  const sendOtp = async () => {
-    const emailVal = email.value?.trim()
-    if (!emailVal || !emailVal.includes("@")) {
-      otpError.value = "Please enter a valid email address first."
-      return
+  // On mount — check if returning from Firebase email link
+  onMounted(async () => {
+    const { $firebaseAuth } = useNuxtApp()
+    const currentUrl = window.location.href
+
+    if (isSignInWithEmailLink($firebaseAuth as any, currentUrl)) {
+      const savedEmail = localStorage.getItem("emailForSignIn")
+      if (!savedEmail) {
+        verifyError.value = "Could not verify email. Please try again."
+        return
+      }
+      try {
+        const result = await signInWithEmailLink($firebaseAuth as any, savedEmail, currentUrl)
+        const token = await (result.user as any).getIdToken()
+        emailToken.value = token
+        emailVerified.value = true
+        setFieldValue("email", savedEmail)
+        localStorage.removeItem("emailForSignIn")
+        window.history.replaceState({}, document.title, window.location.pathname)
+      } catch {
+        verifyError.value = "Verification link is invalid or expired. Please request a new one."
+      }
     }
-    otpSending.value = true
-    otpError.value = null
-    try {
-      await apiFetch("/api/otp/send", { method: "POST", body: { email: emailVal } })
-      otpSent.value = true
-      startCooldown()
-    } catch (err: unknown) {
-      otpError.value = err instanceof Error ? err.message : "Failed to send OTP. Please try again."
-    } finally {
-      otpSending.value = false
-    }
+  })
+
+  // Dev only — bypasses Firebase for local testing
+  const devBypass = () => {
+    emailToken.value = "dev-bypass"
+    emailVerified.value = true
+    verifyError.value = null
   }
 
-  const verifyOtp = async () => {
-    if (!otpCode.value || otpCode.value.length !== 6) {
-      otpError.value = "Please enter the 6-digit OTP."
+  const sendVerificationLink = async () => {
+    const { $firebaseAuth } = useNuxtApp()
+    const emailVal = email.value?.trim()
+
+    if (!emailVal || !emailVal.includes("@")) {
+      verifyError.value = "Please enter a valid email address first."
       return
     }
-    otpVerifying.value = true
-    otpError.value = null
+    linkSending.value = true
+    verifyError.value = null
     try {
-      const res = await apiFetch<{ email_token: string }>("/api/otp/verify", {
-        method: "POST",
-        body: { email: email.value, otp: otpCode.value },
+      await sendSignInLinkToEmail($firebaseAuth as any, emailVal, {
+        url: `${window.location.origin}/contact?verified=1`,
+        handleCodeInApp: true,
+        dynamicLinkDomain: undefined,
       })
-      emailToken.value = res.email_token
-      emailVerified.value = true
+      localStorage.setItem("emailForSignIn", emailVal)
+      linkSent.value = true
     } catch (err: unknown) {
-      otpError.value = err instanceof Error ? err.message : "Invalid OTP. Please try again."
+      verifyError.value = err instanceof Error ? err.message : "Failed to send verification link."
     } finally {
-      otpVerifying.value = false
+      linkSending.value = false
     }
   }
 
@@ -116,8 +118,7 @@ export function useContactForm() {
       })
       isSuccess.value = true
       resetForm()
-      otpCode.value = ""
-      otpSent.value = false
+      linkSent.value = false
       emailVerified.value = false
       emailToken.value = null
     } catch (err: unknown) {
@@ -137,16 +138,11 @@ export function useContactForm() {
     isSubmitting,
     isSuccess,
     serverError,
-    submit,
-    // OTP
-    otpCode,
-    otpSending,
-    otpSent,
-    otpVerifying,
+    linkSending,
+    linkSent,
     emailVerified,
-    otpError,
-    otpCooldown,
-    sendOtp,
-    verifyOtp,
+    verifyError,
+    sendVerificationLink,
+    devBypass,
   }
 }
