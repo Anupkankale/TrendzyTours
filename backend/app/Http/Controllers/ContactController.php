@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lead;
+use App\Models\OtpVerification;
 use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,9 +16,23 @@ class ContactController extends Controller
             'name'         => 'required|string|min:2',
             'email'        => 'required|email',
             'phone'        => 'required|string|min:10',
+            'emailToken'   => 'required|string',
             'tourInterest' => 'nullable|string',
             'message'      => 'required|string|min:10',
         ]);
+
+        $verified = OtpVerification::where('email_token', $data['emailToken'])
+            ->where('email', $data['email'])
+            ->whereNotNull('verified_at')
+            ->where('verified_at', '>=', now()->subMinutes(30))
+            ->exists();
+
+        if (!$verified) {
+            return response()->json([
+                'message' => 'Email not verified. Please verify your email with OTP first.',
+                'errors'  => ['emailToken' => ['Email verification required.']],
+            ], 422);
+        }
 
         $lead = Lead::create([
             'name'          => $data['name'],
