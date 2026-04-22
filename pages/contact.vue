@@ -11,10 +11,8 @@ const {
   name, nameProps, email, emailProps, phone, phoneProps,
   tourInterest, tourInterestProps, message, messageProps,
   errors, isSubmitting, isSuccess, serverError, submit,
-  linkSending, linkSent, emailVerified, verifyError, sendVerificationLink, devBypass,
+  linkSending, linkSent, emailVerified, verifyError, sendVerificationLink,
 } = useContactForm()
-
-const isDev = import.meta.dev
 </script>
 
 <template>
@@ -125,13 +123,9 @@ const isDev = import.meta.dev
               </div>
               <p v-if="errors.email" class="mt-1 text-xs text-red-500">{{ errors.email }}</p>
               <p v-if="linkSent && !emailVerified" class="mt-1 text-xs text-blue-600">
-                Check your inbox and click the verification link. This page will update automatically.
+                Check your inbox and click the verification link. Then come back to this page to submit.
               </p>
               <p v-if="verifyError" class="mt-1 text-xs text-red-500">{{ verifyError }}</p>
-              <!-- Dev bypass — only visible in development -->
-              <button v-if="isDev && !emailVerified" type="button" class="mt-1 text-xs text-orange-500 underline" @click="devBypass">
-                [Dev] Skip verification
-              </button>
             </div>
 
             <div>

@@ -72,13 +72,6 @@ export function useContactForm() {
     }
   })
 
-  // Dev only — bypasses Firebase for local testing
-  const devBypass = () => {
-    emailToken.value = "dev-bypass"
-    emailVerified.value = true
-    verifyError.value = null
-  }
-
   const sendVerificationLink = async () => {
     const { $firebaseAuth } = useNuxtApp()
     const emailVal = email.value?.trim()
@@ -91,14 +84,20 @@ export function useContactForm() {
     verifyError.value = null
     try {
       await sendSignInLinkToEmail($firebaseAuth as any, emailVal, {
-        url: `${window.location.origin}/contact?verified=1`,
+        url: `${window.location.origin}/contact`,
         handleCodeInApp: true,
-        dynamicLinkDomain: undefined,
       })
       localStorage.setItem("emailForSignIn", emailVal)
       linkSent.value = true
     } catch (err: unknown) {
-      verifyError.value = err instanceof Error ? err.message : "Failed to send verification link."
+      const code = (err as any)?.code ?? ""
+      if (code === "auth/operation-not-allowed" || code === "auth/configuration-not-found") {
+        verifyError.value = "Email link sign-in is not enabled. Go to Firebase Console → Authentication → Sign-in method → Email/Password → enable Email link."
+      } else if (code === "auth/invalid-continue-uri" || code === "auth/unauthorized-continue-uri") {
+        verifyError.value = "This domain is not authorised in Firebase. Add it under Authentication → Settings → Authorized domains."
+      } else {
+        verifyError.value = err instanceof Error ? err.message : "Failed to send verification link."
+      }
     } finally {
       linkSending.value = false
     }
@@ -143,6 +142,6 @@ export function useContactForm() {
     emailVerified,
     verifyError,
     sendVerificationLink,
-    devBypass,
+    submit,
   }
 }

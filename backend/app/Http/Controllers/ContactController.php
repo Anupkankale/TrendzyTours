@@ -21,25 +21,20 @@ class ContactController extends Controller
             'message'      => 'required|string|min:10',
         ]);
 
-        // Dev bypass — only works in local environment
-        $isDevBypass = app()->environment('local') && $data['emailToken'] === 'dev-bypass';
+        try {
+            $verifiedEmail = (new FirebaseService())->verifyToken($data['emailToken']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Email verification failed. Please verify your email and try again.',
+                'errors'  => ['emailToken' => ['Invalid or expired verification token.']],
+            ], 422);
+        }
 
-        if (!$isDevBypass) {
-            try {
-                $verifiedEmail = (new FirebaseService())->verifyToken($data['emailToken']);
-            } catch (\Exception $e) {
-                return response()->json([
-                    'message' => 'Email verification failed. Please verify your email and try again.',
-                    'errors'  => ['emailToken' => ['Invalid or expired verification token.']],
-                ], 422);
-            }
-
-            if (strtolower($verifiedEmail) !== strtolower($data['email'])) {
-                return response()->json([
-                    'message' => 'Email mismatch. Please verify the email you used in the form.',
-                    'errors'  => ['email' => ['Verified email does not match.']],
-                ], 422);
-            }
+        if (strtolower($verifiedEmail) !== strtolower($data['email'])) {
+            return response()->json([
+                'message' => 'Email mismatch. Please verify the email you used in the form.',
+                'errors'  => ['email' => ['Verified email does not match.']],
+            ], 422);
         }
 
         $lead = Lead::create([
