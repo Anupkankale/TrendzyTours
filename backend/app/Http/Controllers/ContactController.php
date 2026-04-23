@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lead;
-use App\Services\FirebaseService;
+use App\Models\OtpVerification;
 use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,18 +21,20 @@ class ContactController extends Controller
             'message'      => 'required|string|min:10',
         ]);
 
-        try {
-            $verifiedEmail = (new FirebaseService())->verifyToken($data['emailToken']);
-        } catch (\Exception $e) {
+        $record = OtpVerification::where('email_token', $data['emailToken'])
+            ->whereNotNull('verified_at')
+            ->first();
+
+        if (!$record) {
             return response()->json([
-                'message' => 'Email verification failed. Please verify your email and try again.',
+                'message' => 'Email not verified. Please verify your email with the OTP and try again.',
                 'errors'  => ['emailToken' => ['Invalid or expired verification token.']],
             ], 422);
         }
 
-        if (strtolower($verifiedEmail) !== strtolower($data['email'])) {
+        if (strtolower($record->email) !== strtolower($data['email'])) {
             return response()->json([
-                'message' => 'Email mismatch. Please verify the email you used in the form.',
+                'message' => 'Email mismatch. Please verify the same email you entered in the form.',
                 'errors'  => ['email' => ['Verified email does not match.']],
             ], 422);
         }
@@ -46,6 +48,8 @@ class ContactController extends Controller
             'source'        => 'contact-form',
             'status'        => 'new',
         ]);
+
+        $record->delete();
 
         $this->sendNotificationEmail($lead);
 

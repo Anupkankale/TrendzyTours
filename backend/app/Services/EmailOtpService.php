@@ -2,41 +2,17 @@
 
 namespace App\Services;
 
-use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Mail;
 
 class EmailOtpService
 {
-    private Client $client;
-    private string $apiKey;
-    private string $fromEmail;
-
-    public function __construct()
-    {
-        $this->client    = new Client();
-        $this->apiKey    = env('RESEND_API_KEY', '');
-        $this->fromEmail = env('RESEND_FROM_EMAIL', 'noreply@trendzytours.com');
-    }
-
     public function send(string $email, string $otp): bool
     {
-        if (!$this->apiKey) {
-            \Log::info("OTP skipped (no RESEND_API_KEY). OTP for {$email}: {$otp}");
-            return true;
-        }
-
         try {
-            $this->client->post('https://api.resend.com/emails', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->apiKey,
-                    'Content-Type'  => 'application/json',
-                ],
-                'json' => [
-                    'from'    => 'Trendzy Tours <' . $this->fromEmail . '>',
-                    'to'      => [$email],
-                    'subject' => 'Your Trendzy Tours Verification Code',
-                    'html'    => $this->buildEmailHtml($otp),
-                ],
-            ]);
+            Mail::html($this->buildEmailHtml($otp), function ($message) use ($email) {
+                $message->to($email)
+                        ->subject('Your Trendzy Tours Verification Code');
+            });
 
             return true;
         } catch (\Exception $e) {
