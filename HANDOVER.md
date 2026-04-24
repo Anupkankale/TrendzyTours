@@ -2,53 +2,43 @@
 
 ---
 
-**Date:** 2026-04-22
-**Time:** 20:41 IST (UTC+5:30)
+**Date:** 2026-04-23
+**Time:** 21:30 IST (UTC+5:30)
 **Author:** Anup Kankale
-
----
-
-## Problem Statement
-
-The contact form on `/contact` requires users to verify their email address before submitting an enquiry. The goal is to prevent spam leads and ensure only real email addresses reach the CRM.
-
-**Issues encountered during this session:**
-
-1. **OTP email not delivered** — The backend OTP system (using Brevo API) was failing silently. Root cause: Brevo SMTP not activated on the account, causing a `403 Forbidden` error on every send attempt.
-2. **OTP input field missing** — The frontend had no visible input field for users to enter a code. The UI only showed a "Verify Email" button with no follow-up step.
-3. **Firebase magic link going to spam** — After switching to Firebase email link verification, emails were received but landed in Gmail spam. The email showed `project-987082261276` instead of "Trendzy Tours" due to the Firebase project not being renamed.
-4. **No email received at all (initially)** — Firebase Email Link sign-in was not enabled in Firebase Console, causing Firebase to silently reject send requests.
-
-**Decision:** Settled on Firebase Email Link verification (magic link). OTP backend code is built and routed but the UI uses Firebase links. Firebase Console branding fixes are still pending.
 
 ---
 
 ## Current Work (Active)
 
-### Email Verification on Contact Form
-The contact form at `/contact` requires email verification before a lead can be submitted. The current implementation uses **Firebase Email Link (passwordless sign-in)**.
+### Contact Form — Brevo SMTP OTP Verification (COMPLETE)
+
+The contact form at `/contact` requires email verification before a lead is submitted. Verification uses a **6-digit OTP sent via Brevo SMTP**.
 
 **How it works:**
-1. User fills their email and clicks **"Verify Email"**
-2. Firebase sends a sign-in link to their inbox
-3. User clicks the link → redirected back to `/contact`
-4. Page auto-detects the Firebase link, signs in, marks email as verified
-5. User completes and submits the form
-
-**Status:** Code is working. Two Firebase Console actions still pending:
-- Change public-facing project name from `project-987082261276` → `Trendzy Tours`
-  - Firebase Console → Project settings → General → Public-facing name
-- Customize email template to reduce spam risk
-  - Firebase Console → Authentication → Templates → Sign-in link → Edit sender name & subject
+1. User enters email → clicks **Send OTP**
+2. Backend sends a 6-digit code to their inbox (expires in 10 minutes, max 3 requests per 10 minutes)
+3. Six individual digit boxes appear — user types the code, auto-verifies on the 6th digit
+4. Correct OTP → green ✓, boxes turn green, email field shows "Verified"
+5. Wrong OTP → red ✗, boxes shake and clear after 1.5s for retry
+6. User fills the rest of the form and submits — lead is created in the database
 
 **Key files:**
-- `composables/useContactForm.ts` — sends Firebase link, handles return callback
-- `pages/contact.vue` — contact form UI with verify button
-- `backend/app/Http/Controllers/ContactController.php` — verifies Firebase ID token via `FirebaseService`
-- `backend/app/Services/FirebaseService.php` — wraps Kreait Firebase SDK token verification
-- `plugins/firebase.client.ts` — initializes Firebase app on client side
+- `composables/useContactForm.ts` — OTP send/verify flow, stores `email_token` after verification
+- `pages/contact.vue` — contact form UI, uses `<UiAppOtpInput>` for the code entry
+- `components/ui/AppOtpInput.vue` — 6-box PIN input component (auto-focus, paste, auto-verify)
+- `backend/app/Http/Controllers/OtpController.php` — `POST /api/otp/send` and `POST /api/otp/verify`
+- `backend/app/Services/EmailOtpService.php` — sends OTP email via Laravel `Mail::html()` (Brevo SMTP)
+- `backend/app/Http/Controllers/ContactController.php` — validates `email_token` from `otp_verifications` table, creates `Lead`, sends admin notification
 
-**Firebase project:** `trendzy-auth` (project ID), API key in `frontend/.env`
+**Important Brevo SMTP credential note:**
+The SMTP login is NOT the Brevo account email. It is a system-assigned address shown at:
+**Brevo → Settings → SMTP & API → SMTP tab → "Login"**
+
+```
+MAIL_USERNAME=a8a8c5001@smtp-brevo.com   ← system login, not account email
+MAIL_PASSWORD=xsmtpsib-...               ← SMTP key generated in Brevo dashboard
+MAIL_FROM_ADDRESS=tradestrome@gmail.com  ← must be a verified sender in Brevo
+```
 
 ---
 
@@ -67,18 +57,18 @@ The contact form at `/contact` requires email verification before a lead can be 
 | Destinations | `/destinations` | Done |
 | Holidays | `/holidays` | Done |
 | Blog | `/blog` | Done |
-| Contact form | `/contact` | Done (see active work above) |
+| Contact form | `/contact` | Done — Brevo SMTP OTP verified |
 | Login | `/login` | Done |
 
 ### Iteration 2 — Role-Based Dashboard (In Progress)
 | Page | Route | Status |
 |------|-------|--------|
-| Dashboard home | `/dashboard` | Scaffolded |
-| Leads list | `/dashboard/leads` | Scaffolded |
-| Lead detail | `/dashboard/leads/[id]` | Scaffolded |
+| Dashboard home | `/dashboard` | Scaffolded — stat cards are hardcoded, not wired to DB |
+| Leads list | `/dashboard/leads` | Working — search, filter, stat cards, Add Lead modal |
+| Lead detail | `/dashboard/leads/[id]` | Working — notes timeline, status change, quick actions |
 
 **Roles:** `admin`, `sales`, `customer`, `seo`
-**Auth:** JWT cookie — `/api/auth/login`, `/api/auth/logout`, `/api/auth/me`
+**Auth:** JWT cookie — `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/me`
 **Access control:** `middleware/auth.ts` + `middleware/role.ts`
 
 ---
@@ -87,76 +77,91 @@ The contact form at `/contact` requires email verification before a lead can be 
 
 ### Frontend (Nuxt 3)
 - **Framework:** Nuxt 3.21.2 + TypeScript
-- **Styling:** Tailwind CSS 3 — gold/dark/cream palette
+- **Styling:** Tailwind CSS 3 — brand (#1e6c93), gold, dark, cream palettes (all in `tailwind.config.ts`)
 - **Fonts:** Playfair Display (headings), Inter (body)
-- **State:** Pinia (`stores/auth.ts`, `stores/tours.ts`, `stores/ui.ts`)
+- **State:** Pinia (`stores/auth.ts`, `stores/tours.ts`, `stores/ui.ts`, `stores/leads.ts`)
 - **Forms:** vee-validate + zod
-- **Auth (client):** Firebase (`firebase/auth`) — email link verification
 - **Content:** @nuxt/content — markdown blog posts in `content/blog/`
 - **Images:** @nuxt/image (webp/avif)
 
 ### Backend (Laravel — `backend/`)
-- **Framework:** Laravel (PHP), running via Docker/Sail on port `8888`
+- **Framework:** Laravel (PHP), Docker/Sail on port `8888`
 - **Auth:** JWT (`tymon/jwt-auth`) + custom `ParseJwtFromCookie` middleware
-- **Email verification:** Firebase Admin SDK (`kreait/firebase-php`)
-- **Email delivery (leads notification):** Brevo API (`BREVO_API_KEY` in `backend/.env`)
-- **Database:** MySQL (Docker)
+- **OTP emails:** Laravel `Mail::html()` → Brevo SMTP (`smtp-relay.brevo.com:587`)
+- **Lead notification emails:** Brevo REST API (`BREVO_API_KEY`)
+- **Database:** MySQL (Docker, port 3307 on host)
 
 ### API Endpoints
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/tours` | All tours |
 | GET | `/api/tours/{slug}` | Single tour |
-| POST | `/api/contact` | Contact form → creates Lead, requires Firebase token |
-| POST | `/api/newsletter` | Newsletter signup |
+| POST | `/api/otp/send` | Send 6-digit OTP (rate limited: 3/10 min) |
+| POST | `/api/otp/verify` | Verify OTP → returns `email_token` UUID |
+| POST | `/api/contact` | Validate `email_token`, create Lead, notify admin |
+| POST | `/api/newsletter` | Newsletter signup (Brevo) |
 | POST | `/api/auth/login` | Login → JWT cookie |
 | POST | `/api/auth/logout` | Clear session |
 | GET | `/api/auth/me` | Current user |
-| POST | `/api/otp/send` | Send OTP code (backend ready, not active in UI) |
-| POST | `/api/otp/verify` | Verify OTP code (backend ready, not active in UI) |
 | GET | `/api/leads` | List leads (admin/sales only) |
-| POST | `/api/leads` | Create lead (admin/sales only) |
+| POST | `/api/leads` | Create lead manually (admin/sales only) |
 | GET | `/api/leads/{id}` | Lead detail (admin/sales only) |
-| PUT | `/api/leads/{id}` | Update lead (admin/sales only) |
+| PUT | `/api/leads/{id}` | Update status or add note (admin/sales only) |
 
 ---
 
 ## Environment Setup
 
-### Frontend `.env` (root)
+### Frontend `.env` (project root)
 ```
 NUXT_PUBLIC_API_BASE=http://localhost:8888
-NUXT_PUBLIC_FIREBASE_API_KEY=...
-NUXT_PUBLIC_FIREBASE_AUTH_DOMAIN=trendzy-auth.firebaseapp.com
-NUXT_PUBLIC_FIREBASE_PROJECT_ID=trendzy-auth
-NUXT_PUBLIC_FIREBASE_APP_ID=...
-NUXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
 ```
 
 ### Backend `.env` (`backend/.env`)
 ```
+# Database
 DB_CONNECTION=mysql
-BREVO_API_KEY=...            # for lead notification emails
-RESEND_API_KEY=...           # added but not active (OTP email, future use)
-FIREBASE_CREDENTIALS=...     # path to firebase-service-account.json inside Docker
+DB_HOST=mysql
+DB_PORT=3306
+DB_DATABASE=laravel
+DB_USERNAME=sail
+DB_PASSWORD=password
+
+# JWT
 JWT_SECRET=...
+
+# Brevo SMTP — OTP emails to users
+MAIL_MAILER=smtp
+MAIL_HOST=smtp-relay.brevo.com
+MAIL_PORT=587
+MAIL_USERNAME=a8a8c5001@smtp-brevo.com
+MAIL_PASSWORD=xsmtpsib-...
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=tradestrome@gmail.com
+MAIL_FROM_NAME="Trendzy Tours"
+
+# Brevo REST API — admin notification on new lead
+BREVO_API_KEY=xkeysib-...
+
 APP_PORT=8888
 ```
 
 ### Dev Commands
 ```bash
-# Frontend
+# Frontend — always run from project root
 npm run dev        # http://localhost:3000
 
-# Backend (inside Docker)
-php artisan migrate
-php artisan config:clear
+# Backend — all artisan commands must run INSIDE Docker
+docker exec backend-laravel.test-1 php artisan migrate
+docker exec backend-laravel.test-1 php artisan config:clear
+
+# Test SMTP
+docker exec backend-laravel.test-1 php artisan tinker --execute="Mail::raw('Test', fn(\$m) => \$m->to('tradestrome@gmail.com')->subject('Test')); echo 'OK';"
 ```
 
 ---
 
 ## Known Issues / Pending
-- Firebase verification emails go to **spam** — fix by customising the email template in Firebase Console (see Current Work above)
-- OTP backend (`/api/otp/send`, `/api/otp/verify`) is built and routed but the frontend uses Firebase magic link instead
-- Brevo SMTP not activated — only used for lead notification emails to admin, may silently fail
-- Dashboard pages are scaffolded but not fully implemented
+- **Dashboard home stat cards** are hardcoded — needs real DB queries
+- **`noreply@trendzytours.com`** not yet a verified sender in Brevo — currently using `tradestrome@gmail.com` as `MAIL_FROM_ADDRESS`
+- **Domain SPF/DKIM** not configured on trendzytours.com for Brevo — first emails may land in spam

@@ -12,7 +12,34 @@ export default {
   theme: {
     extend: {
       // ─── Brand palette ──────────────────────────────────────────────────────
+      keyframes: {
+        shake: {
+          "0%, 100%": { transform: "translateX(0)" },
+          "15%, 45%, 75%": { transform: "translateX(-5px)" },
+          "30%, 60%, 90%": { transform: "translateX(5px)" },
+        },
+      },
+      animation: {
+        shake: "shake 0.5s ease-in-out",
+      },
       colors: {
+        gold: {
+          50:  "#fdf8ed",
+          100: "#fbefc8",
+          200: "#f6db8e",
+          300: "#efc24e",
+          400: "#e8ab27",
+          500: "#d4900f",
+          600: "#b8792e",
+          700: "#9a6025",
+          800: "#7e4e1f",
+          900: "#683f1a",
+        },
+        cream: {
+          50:  "#fefdfb",
+          100: "#faf6ee",
+          200: "#f4ecda",
+        },
         brand: {
           50:  "#eef6fb",
           100: "#d5eaf5",

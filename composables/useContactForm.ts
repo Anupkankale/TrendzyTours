@@ -1,7 +1,6 @@
 import { useForm } from "vee-validate"
 import { toTypedSchema } from "@vee-validate/zod"
 import { z } from "zod"
-import { sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from "firebase/auth"
 
 const schema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -20,14 +19,15 @@ export function useContactForm() {
   const isSuccess = ref(false)
   const serverError = ref<string | null>(null)
 
-  // Email verification state
-  const linkSending = ref(false)
-  const linkSent = ref(false)
+  // OTP state
+  const otpSending = ref(false)
+  const otpSent = ref(false)
+  const otpStatus = ref<"idle" | "verifying" | "verified" | "wrong">("idle")
   const emailVerified = ref(false)
   const emailToken = ref<string | null>(null)
   const verifyError = ref<string | null>(null)
 
-  const { handleSubmit, errors, defineField, resetForm, setFieldValue } = useForm({
+  const { handleSubmit, errors, defineField, resetForm } = useForm({
     validationSchema: toTypedSchema(schema),
   })
 
@@ -37,70 +37,82 @@ export function useContactForm() {
   const [tourInterest, tourInterestProps] = defineField("tourInterest")
   const [message, messageProps] = defineField("message")
 
-  // Reset verification when email changes
+  // Reset OTP state when email changes
   watch(email, () => {
-    if (emailVerified.value) {
+    if (emailVerified.value || otpSent.value) {
       emailVerified.value = false
       emailToken.value = null
-      linkSent.value = false
+      otpSent.value = false
+      otpStatus.value = "idle"
       verifyError.value = null
     }
   })
 
-  // On mount — check if returning from Firebase email link
-  onMounted(async () => {
-    const { $firebaseAuth } = useNuxtApp()
-    const currentUrl = window.location.href
-
-    if (isSignInWithEmailLink($firebaseAuth as any, currentUrl)) {
-      const savedEmail = localStorage.getItem("emailForSignIn")
-      if (!savedEmail) {
-        verifyError.value = "Could not verify email. Please try again."
-        return
-      }
-      try {
-        const result = await signInWithEmailLink($firebaseAuth as any, savedEmail, currentUrl)
-        const token = await (result.user as any).getIdToken()
-        emailToken.value = token
-        emailVerified.value = true
-        setFieldValue("email", savedEmail)
-        localStorage.removeItem("emailForSignIn")
-        window.history.replaceState({}, document.title, window.location.pathname)
-      } catch {
-        verifyError.value = "Verification link is invalid or expired. Please request a new one."
-      }
-    }
-  })
-
-  const sendVerificationLink = async () => {
-    const { $firebaseAuth } = useNuxtApp()
+  const sendOtp = async () => {
     const emailVal = email.value?.trim()
-
     if (!emailVal || !emailVal.includes("@")) {
       verifyError.value = "Please enter a valid email address first."
       return
     }
-    linkSending.value = true
+    otpSending.value = true
+    otpStatus.value = "idle"
     verifyError.value = null
     try {
-      await sendSignInLinkToEmail($firebaseAuth as any, emailVal, {
-        url: `${window.location.origin}/contact`,
-        handleCodeInApp: true,
+      await apiFetch("/api/otp/send", {
+        method: "POST",
+        body: { email: emailVal },
       })
-      localStorage.setItem("emailForSignIn", emailVal)
-      linkSent.value = true
+      otpSent.value = true
     } catch (err: unknown) {
-      const code = (err as any)?.code ?? ""
-      if (code === "auth/operation-not-allowed" || code === "auth/configuration-not-found") {
-        verifyError.value = "Email link sign-in is not enabled. Go to Firebase Console → Authentication → Sign-in method → Email/Password → enable Email link."
-      } else if (code === "auth/invalid-continue-uri" || code === "auth/unauthorized-continue-uri") {
-        verifyError.value = "This domain is not authorised in Firebase. Add it under Authentication → Settings → Authorized domains."
+      const status = (err as any)?.response?.status
+      if (status === 429) {
+        verifyError.value = "Too many requests. Please wait 10 minutes before trying again."
       } else {
-        verifyError.value = err instanceof Error ? err.message : "Failed to send verification link."
+        verifyError.value = err instanceof Error ? err.message : "Failed to send OTP. Please try again."
       }
     } finally {
-      linkSending.value = false
+      otpSending.value = false
     }
+  }
+
+  const verifyOtp = async (otp: string) => {
+    const emailVal = email.value?.trim()
+    if (!emailVal || !otp) return
+    otpStatus.value = "verifying"
+    verifyError.value = null
+    try {
+      const res = await apiFetch<{ email_token: string }>("/api/otp/verify", {
+        method: "POST",
+        body: { email: emailVal, otp },
+      })
+      emailToken.value = res.email_token
+      emailVerified.value = true
+      otpStatus.value = "verified"
+    } catch (err: unknown) {
+      otpStatus.value = "wrong"
+      const data = (err as any)?.data ?? (err as any)?.response?._data
+      const msg = data?.message ?? (err instanceof Error ? err.message : "Invalid OTP. Please try again.")
+      verifyError.value = msg
+      if (msg?.toLowerCase().includes("expired")) {
+        setTimeout(() => {
+          otpSent.value = false
+          otpStatus.value = "idle"
+          verifyError.value = "OTP expired. Please request a new one."
+        }, 1500)
+      }
+    }
+  }
+
+  const resetOtpStatus = () => {
+    otpStatus.value = "idle"
+    verifyError.value = null
+  }
+
+  const resendOtp = async () => {
+    otpSent.value = false
+    otpStatus.value = "idle"
+    verifyError.value = null
+    await sendOtp()
   }
 
   const submit = handleSubmit(async (formValues) => {
@@ -117,7 +129,8 @@ export function useContactForm() {
       })
       isSuccess.value = true
       resetForm()
-      linkSent.value = false
+      otpSent.value = false
+      otpStatus.value = "idle"
       emailVerified.value = false
       emailToken.value = null
     } catch (err: unknown) {
@@ -137,11 +150,27 @@ export function useContactForm() {
     isSubmitting,
     isSuccess,
     serverError,
-    linkSending,
-    linkSent,
+    otpSending,
+    otpSent,
+    otpStatus,
     emailVerified,
     verifyError,
-    sendVerificationLink,
+    sendOtp,
+    verifyOtp,
+    resetOtpStatus,
+    resendOtp,
     submit,
   }
+}
+
+export function useApi() {
+  function apiFetch<T>(path: string, options?: Parameters<typeof $fetch>[1]) {
+    return $fetch<T>(path, {
+      credentials: "include",
+      headers: { Accept: "application/json" },
+      ...options,
+    })
+  }
+
+  return { apiFetch }
 }

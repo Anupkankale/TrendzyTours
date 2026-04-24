@@ -11,7 +11,8 @@ const {
   name, nameProps, email, emailProps, phone, phoneProps,
   tourInterest, tourInterestProps, message, messageProps,
   errors, isSubmitting, isSuccess, serverError, submit,
-  linkSending, linkSent, emailVerified, verifyError, sendVerificationLink,
+  otpSending, otpSent, otpStatus,
+  emailVerified, verifyError, sendOtp, verifyOtp, resetOtpStatus, resendOtp,
 } = useContactForm()
 </script>
 
@@ -97,7 +98,7 @@ const {
               </div>
             </div>
 
-            <!-- Email with Firebase verification -->
+            <!-- Email with OTP verification -->
             <div>
               <label class="mb-1 block text-sm font-medium text-dark-900">Email *</label>
               <div class="flex gap-2">
@@ -106,15 +107,15 @@ const {
                   v-model="email"
                   type="email"
                   placeholder="your@email.com"
-                  :disabled="emailVerified"
+                  :disabled="emailVerified || otpSent"
                   class="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm focus:border-gold-500 focus:outline-none focus:ring-2 focus:ring-gold-200 disabled:bg-gray-50 disabled:text-gray-500" />
                 <button
                   v-if="!emailVerified"
                   type="button"
-                  :disabled="linkSending || linkSent"
+                  :disabled="otpSending || otpSent"
                   class="flex-shrink-0 rounded-lg bg-dark-900 px-3 py-2.5 text-xs font-semibold text-white transition hover:bg-dark-800 disabled:opacity-50"
-                  @click="sendVerificationLink">
-                  {{ linkSending ? "Sending…" : linkSent ? "Link Sent" : "Verify Email" }}
+                  @click="sendOtp">
+                  {{ otpSending ? "Sending…" : otpSent ? "OTP Sent" : "Send OTP" }}
                 </button>
                 <span v-else class="flex flex-shrink-0 items-center gap-1 text-sm font-medium text-green-600">
                   <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
@@ -122,9 +123,19 @@ const {
                 </span>
               </div>
               <p v-if="errors.email" class="mt-1 text-xs text-red-500">{{ errors.email }}</p>
-              <p v-if="linkSent && !emailVerified" class="mt-1 text-xs text-blue-600">
-                Check your inbox and click the verification link. Then come back to this page to submit.
-              </p>
+
+              <!-- OTP boxes — shown after code is sent -->
+              <div v-if="otpSent && !emailVerified" class="mt-3 space-y-2">
+                <UiAppOtpInput
+                  :status="otpStatus"
+                  @complete="verifyOtp"
+                  @reset="resetOtpStatus" />
+                <p class="text-xs text-blue-600">
+                  Check your inbox for a 6-digit code. &nbsp;
+                  <button type="button" class="font-medium underline hover:text-blue-800" @click="resendOtp">Resend OTP</button>
+                </p>
+              </div>
+
               <p v-if="verifyError" class="mt-1 text-xs text-red-500">{{ verifyError }}</p>
             </div>
 
