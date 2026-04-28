@@ -35,6 +35,7 @@ Route::middleware(['auth:api', 'role:admin,sales'])->group(function () {
 // Bookings — admin and sales only
 Route::middleware(['auth:api', 'role:admin,sales'])->group(function () {
     Route::get('/bookings', [BookingController::class, 'index']);
+    Route::post('/bookings', [BookingController::class, 'store']);
     Route::get('/bookings/{id}', [BookingController::class, 'show']);
     Route::put('/bookings/{id}', [BookingController::class, 'update']);
 });

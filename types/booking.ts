@@ -1,4 +1,5 @@
 export type BookingStatus = "pending" | "confirmed" | "cancelled"
+export type BookingSource = "website" | "call" | "reference" | "walk-in"
 
 export interface Booking {
   id: string
@@ -13,6 +14,7 @@ export interface Booking {
   children: number
   message: string | null
   status: BookingStatus
+  source: BookingSource
   createdAt: string
   updatedAt: string
 }

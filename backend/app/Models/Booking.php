@@ -12,7 +12,7 @@ class Booking extends Model
 
     protected $fillable = [
         'tour_id', 'customer_name', 'customer_email', 'customer_phone',
-        'travel_date', 'adults', 'children', 'message', 'status',
+        'travel_date', 'adults', 'children', 'message', 'status', 'source',
     ];
 
     protected $casts = [

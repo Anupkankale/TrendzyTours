@@ -1,9 +1,12 @@
 import { defineStore } from "pinia"
-import type { Booking, BookingStatus } from "@/types/booking"
+import type { Booking, BookingSource, BookingStatus } from "@/types/booking"
+
+interface TourOption { id: string; name: string; destination: string; pricePerPerson: number }
 
 export const useBookingsStore = defineStore("bookings", () => {
   const { apiFetch } = useApi()
   const bookings = ref<Booking[]>([])
+  const tourOptions = ref<TourOption[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
 
@@ -17,6 +20,31 @@ export const useBookingsStore = defineStore("bookings", () => {
     } finally {
       loading.value = false
     }
+  }
+
+  async function fetchTourOptions() {
+    if (tourOptions.value.length) return
+    try {
+      const tours = await apiFetch<TourOption[]>("/api/tours")
+      tourOptions.value = tours
+    } catch {}
+  }
+
+  async function createBooking(data: {
+    tourId: string
+    customerName: string
+    customerEmail: string
+    customerPhone: string
+    travelDate: string
+    adults: number
+    children: number
+    message: string
+    source: BookingSource
+    status: BookingStatus
+  }): Promise<Booking> {
+    const booking = await apiFetch<Booking>("/api/bookings", { method: "POST", body: data })
+    bookings.value.unshift(booking)
+    return booking
   }
 
   async function fetchBooking(id: string): Promise<Booking | null> {
@@ -43,5 +71,5 @@ export const useBookingsStore = defineStore("bookings", () => {
     return counts
   })
 
-  return { bookings, loading, error, statusCounts, fetchBookings, fetchBooking, updateStatus }
+  return { bookings, tourOptions, loading, error, statusCounts, fetchBookings, fetchTourOptions, fetchBooking, updateStatus, createBooking }
 })

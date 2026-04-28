@@ -74,9 +74,14 @@ function formatDateTime(iso: string) {
               <h1 class="font-heading text-2xl font-bold text-dark-900">{{ booking.customerName }}</h1>
               <p class="mt-0.5 text-sm text-dark-400">Booked on {{ formatDateTime(booking.createdAt) }}</p>
             </div>
-            <span :class="['inline-flex rounded-full px-3 py-1 text-xs font-semibold', statusConfig[booking.status].classes]">
-              {{ statusConfig[booking.status].label }}
-            </span>
+            <div class="flex flex-col items-end gap-2">
+              <span :class="['inline-flex rounded-full px-3 py-1 text-xs font-semibold', statusConfig[booking.status].classes]">
+                {{ statusConfig[booking.status].label }}
+              </span>
+              <span class="inline-flex rounded-full bg-dark-100 px-3 py-1 text-xs font-medium text-dark-600 capitalize">
+                {{ booking.source }}
+              </span>
+            </div>
           </div>
 
           <!-- Contact details -->

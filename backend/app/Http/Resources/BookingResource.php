@@ -22,6 +22,7 @@ class BookingResource extends JsonResource
             'children'      => $this->children,
             'message'       => $this->message,
             'status'        => $this->status,
+            'source'        => $this->source,
             'createdAt'     => $this->created_at->toISOString(),
             'updatedAt'     => $this->updated_at->toISOString(),
         ];
