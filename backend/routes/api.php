@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\NewsletterController;
@@ -29,4 +30,11 @@ Route::middleware(['auth:api', 'role:admin,sales'])->group(function () {
     Route::post('/leads', [LeadController::class, 'store']);
     Route::get('/leads/{id}', [LeadController::class, 'show']);
     Route::put('/leads/{id}', [LeadController::class, 'update']);
+});
+
+// Bookings — admin and sales only
+Route::middleware(['auth:api', 'role:admin,sales'])->group(function () {
+    Route::get('/bookings', [BookingController::class, 'index']);
+    Route::get('/bookings/{id}', [BookingController::class, 'show']);
+    Route::put('/bookings/{id}', [BookingController::class, 'update']);
 });
