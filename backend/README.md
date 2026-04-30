@@ -64,4 +64,4 @@ cd ~/projects/tour-nuxt/backend
 
 #then
 
-./vendor/bin/sail up -d
+./vendor/bin/sail up -d# TrendzyToursBackend

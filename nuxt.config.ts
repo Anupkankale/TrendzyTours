@@ -70,6 +70,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
+      apiBase: process.env.NUXT_PUBLIC_API_BASE,
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL ?? "https://trendzytours.com",
       whatsappNumber: process.env.WHATSAPP_NUMBER ?? "917123578454",
     },
