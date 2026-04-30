@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             TourSeeder::class,
             DestinationSeeder::class,
             TestimonialSeeder::class,
+            BookingSeeder::class,
         ]);
     }
 }
