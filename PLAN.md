@@ -14,6 +14,8 @@
 
 ## PHASE 1 — Complete the Dashboard (Iteration 2)
 
+**Status:** [~] In progress
+
 ### [x] Feature 1 — Bookings List Page
 **Route:** `/dashboard/bookings`  
 **Who:** admin, sales  
@@ -30,14 +32,14 @@
 
 ---
 
-### Feature 2 — Tours CRUD (Dashboard)
+### [x] Feature 2 — Tours CRUD (Dashboard)
 **Route:** `/dashboard/tours`, `/dashboard/tours/create`, `/dashboard/tours/[id]/edit`  
 **Who:** admin  
 **What to build:**
-- List all tours in a table (title, price, category, status toggle)
+- List all tours in a table (title, price, category, live/not-live toggle)
 - Create tour form (title, slug, description, price, duration, images, category)
 - Edit existing tour
-- Delete with confirm modal
+- Manage whether a tour is live on public pages
 
 **Files to create:**
 - `pages/dashboard/tours/index.vue`
@@ -46,7 +48,7 @@
 
 ---
 
-### Feature 3 — Blog CMS (Dashboard)
+### [ ] Feature 3 — Blog CMS (Dashboard)
 **Route:** `/dashboard/blog`, `/dashboard/blog/create`, `/dashboard/blog/[id]/edit`  
 **Who:** admin, seo  
 **What to build:**
@@ -61,7 +63,7 @@
 
 ---
 
-### Feature 4 — Users Management (Dashboard)
+### [ ] Feature 4 — Users Management (Dashboard)
 **Route:** `/dashboard/users`  
 **Who:** admin only  
 **What to build:**
@@ -209,5 +211,5 @@
 
 ---
 
-> **Current Feature:** Feature 2 — Tours CRUD  
-> **Last Updated:** 2026-04-28
+> **Current Feature:** Feature 3 — Blog CMS  
+> **Last Updated:** 2026-04-30

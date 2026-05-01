@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { tours } from "@/data/tours"
-
-const featured = tours.filter((t) => t.featured)
+const { tours: featured } = useTours({ featured: true, key: "featured-tours" })
 </script>
 
 <template>
@@ -21,7 +19,7 @@ const featured = tours.filter((t) => t.featured)
           </svg>
         </NuxtLink>
       </div>
-      <ToursTourGrid :tours="featured" />
+      <ToursTourGrid :tours="featured ?? []" />
       <!-- Mobile view-all -->
       <div class="mt-8 flex justify-center sm:hidden">
         <UiAppButton href="/holidays" variant="secondary" icon-right>View all holidays</UiAppButton>

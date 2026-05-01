@@ -39,3 +39,12 @@ Route::middleware(['auth:api', 'role:admin,sales'])->group(function () {
     Route::get('/bookings/{id}', [BookingController::class, 'show']);
     Route::put('/bookings/{id}', [BookingController::class, 'update']);
 });
+
+// Tours dashboard — admin only
+Route::middleware(['auth:api', 'role:admin'])->prefix('/admin/tours')->group(function () {
+    Route::get('/', [TourController::class, 'adminIndex']);
+    Route::post('/', [TourController::class, 'store']);
+    Route::get('/{id}', [TourController::class, 'adminShow']);
+    Route::put('/{id}', [TourController::class, 'update']);
+    Route::delete('/{id}', [TourController::class, 'destroy']);
+});

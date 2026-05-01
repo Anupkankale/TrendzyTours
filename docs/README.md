@@ -15,3 +15,4 @@ Welcome to the Trendzy Tours documentation. This folder contains all project doc
 | [middleware.md](middleware.md) | Route middleware documentation |
 | [styling.md](styling.md) | Tailwind CSS conventions and design tokens |
 | [setup.md](setup.md) | Local development setup guide |
+| [backend-local.md](backend-local.md) | Short local quickstart for running the Laravel backend |

@@ -1,8 +1,22 @@
 import type { Tour } from "@/types/tour"
 
-export function useTours() {
+interface UseToursOptions {
+  category?: string
+  region?: string
+  featured?: boolean
+  key?: string
+}
+
+export function useTours(options: UseToursOptions = {}) {
   const { apiFetch } = useApi()
-  const { data: tours, pending, error } = useAsyncData<Tour[]>("tours", () => apiFetch("/api/tours"))
+  const query = {
+    ...(options.category ? { category: options.category } : {}),
+    ...(options.region ? { region: options.region } : {}),
+    ...(typeof options.featured === "boolean" ? { featured: String(options.featured) } : {}),
+  }
+
+  const key = options.key ?? ["tours", options.category ?? "all", options.region ?? "all", String(options.featured ?? "all")].join(":")
+  const { data: tours, pending, error } = useAsyncData<Tour[]>(key, () => apiFetch("/api/tours", { query }))
   return { tours, pending, error }
 }
 

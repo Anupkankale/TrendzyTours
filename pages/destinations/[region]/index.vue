@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { regions } from "@/data/destinations"
-import { tours } from "@/data/tours"
 
 const route = useRoute()
 const region = regions.find((r) => r.slug === route.params.region)
 
 if (!region) throw createError({ statusCode: 404, statusMessage: "Region not found" })
-
-const regionTours = tours.filter((t) => t.region === region.slug)
+const { tours: regionTours } = useTours({ region: region.slug, key: `region-${region.slug}-live-tours` })
 
 useSeoMeta({
   title: `${region.name} Tour Packages | Trendzy Tours`,
@@ -34,9 +32,9 @@ useSeoMeta({
     </section>
     <section class="section-padding bg-white">
       <div class="container-max px-4 sm:px-6 lg:px-8">
-        <template v-if="regionTours.length">
-          <UiAppSectionTitle :title="`${region.name} Tours`" :subtitle="`${regionTours.length} packages available`" />
-          <ToursTourGrid :tours="regionTours" />
+        <template v-if="(regionTours?.length ?? 0) > 0">
+          <UiAppSectionTitle :title="`${region.name} Tours`" :subtitle="`${regionTours?.length ?? 0} packages available`" />
+          <ToursTourGrid :tours="regionTours ?? []" />
         </template>
         <div v-else class="py-16 text-center">
           <p class="text-gray-500">No tours currently available for this region. Please check back soon or contact us for custom packages.</p>

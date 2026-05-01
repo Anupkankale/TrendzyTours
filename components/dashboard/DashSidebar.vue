@@ -16,7 +16,7 @@ const auth = useAuthStore()
 const allNavItems = [
   { label: "Dashboard", href: "/dashboard", icon: HomeIcon, roles: ["admin", "sales", "customer", "seo"] },
   { label: "Leads", href: "/dashboard/leads", icon: UserGroupIcon, roles: ["admin", "sales"] },
-  { label: "Tours", href: "/dashboard/tours", icon: GlobeAltIcon, roles: ["admin", "sales"] },
+  { label: "Tours", href: "/dashboard/tours", icon: GlobeAltIcon, roles: ["admin"] },
   { label: "Bookings", href: "/dashboard/bookings", icon: CalendarIcon, roles: ["admin", "sales", "customer"] },
   { label: "Users", href: "/dashboard/users", icon: UsersIcon, roles: ["admin"] },
   { label: "Blog", href: "/dashboard/blog", icon: DocumentTextIcon, roles: ["admin", "seo"] },
