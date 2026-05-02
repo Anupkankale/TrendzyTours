@@ -1,4 +1,4 @@
-import { useForm } from "vee-validate"
+ import { useForm } from "vee-validate"
 import { toTypedSchema } from "@vee-validate/zod"
 import { z } from "zod"
 
@@ -161,16 +161,4 @@ export function useContactForm() {
     resendOtp,
     submit,
   }
-}
-
-export function useApi() {
-  function apiFetch<T>(path: string, options?: Parameters<typeof $fetch>[1]) {
-    return $fetch<T>(path, {
-      credentials: "include",
-      headers: { Accept: "application/json" },
-      ...options,
-    })
-  }
-
-  return { apiFetch }
 }
