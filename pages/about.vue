@@ -34,7 +34,7 @@ const values = [
             Founded in Nagpur, Trendzy Tours was born from a simple belief: that every journey should be as memorable as the destination itself. What started as a small boutique travel company has grown into one of Central India's most trusted travel agencies, serving thousands of happy travellers every year.
           </p>
           <p class="mt-4 text-gray-600 leading-relaxed">
-            From the rice terraces of Bali to the sand dunes of Jaisalmer, from Norwegian fjords to Caribbean cruises — we have been the bridge between your travel dreams and extraordinary reality.
+            From the rice terraces of Bali to the sand dunes of Jaisalmer, from Norwegian fjords to Caribbean cruises we have been the bridge between your travel dreams and extraordinary reality.
           </p>
           <p class="mt-4 text-gray-600 leading-relaxed">
             Our promise is simple: <strong class="text-dark-900">Your Journey, Our Promise</strong>. Every package we curate, every guide we deploy, every hotel we select is chosen with your comfort, safety, and delight in mind.
