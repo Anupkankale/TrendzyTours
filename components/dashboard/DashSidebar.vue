@@ -31,10 +31,10 @@ const navItems = computed(() =>
 
 <template>
   <aside class="hidden w-64 flex-shrink-0 flex-col bg-dark-900 lg:flex">
-    <div class="flex h-16 items-center px-6">
-      <NuxtLink to="/" class="font-heading text-lg font-bold text-white">
-        Trendzy<span class="text-gold-500">Tours</span>
-      </NuxtLink>
+    <div class="flex h-16 items-center mt-4 px-6">
+        <NuxtLink to="/" class="font-heading text-2xl font-bold text-white">
+          <img src="/images/tours/logo/TrendzyTourslogo.png" alt="Trendzy Tours" class="h-14 w-auto mx-auto" />
+        </NuxtLink>
     </div>
     <nav class="flex-1 overflow-y-auto px-3 py-4">
       <NuxtLink

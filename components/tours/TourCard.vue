@@ -1,4 +1,4 @@
-<script setup lang="ts">
+ <script setup lang="ts">
 import { HeartIcon } from "@heroicons/vue/24/outline"
 import { HeartIcon as HeartSolidIcon, StarIcon } from "@heroicons/vue/24/solid"
 import type { Tour } from "@/types/tour"

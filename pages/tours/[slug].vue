@@ -2,6 +2,7 @@
 import { CheckCircleIcon, XCircleIcon, CalendarIcon, UsersIcon } from "@heroicons/vue/24/outline"
 import { StarIcon } from "@heroicons/vue/20/solid"
 import type { Tour } from "@/types/tour"
+import { tours as fallbackTours } from "@/data/tours"
 
 const route = useRoute()
 const { apiFetch } = useApi()
@@ -11,7 +12,7 @@ const { data: tour } = await useAsyncData<Tour | null>(
     try {
       return await apiFetch<Tour>(`/api/tours/${route.params.slug}`)
     } catch {
-      return null
+      return fallbackTours.find((item) => item.slug === route.params.slug) ?? null
     }
   },
 )

@@ -63,7 +63,7 @@ class TourSeeder extends Seeder
                 'exclusions'        => ['Flights to/from Jaipur', 'Personal expenses'],
                 'featured'          => true,
                 'published_at'      => '2025-01-15',
-                'gallery'           => ['https://images.unsplash.com/photo-1477587458883-47145ed94373?w=800&q=85&auto=format&fit=crop'],
+                'gallery'           => ['https://images.unsplash.com/photo-1537953773345-d172ccf13cf1?w=800&q=85&auto=format&fit=crop'],
                 'itinerary'         => [
                     ['day' => 1,  'title' => 'Arrive Jaipur',          'description' => 'Pink City welcome, Hawa Mahal visit.',                              'meals' => ['Dinner'],              'accommodation' => null],
                     ['day' => 2,  'title' => 'Jaipur Forts',           'description' => 'Amber Fort, City Palace, Jantar Mantar.',                            'meals' => ['Breakfast', 'Dinner'], 'accommodation' => null],
