@@ -1,12 +1,9 @@
 <script setup lang="ts">
-import { tours } from "@/data/tours"
-
 useSeoMeta({
   title: "Ladies Only Tours | Trendzy Tours",
   description: "Safe, curated travel experiences exclusively for women. Ladies only holiday packages from Trendzy Tours, Nagpur.",
 })
-
-const ladiesOnly = tours.filter((t) => t.category === "ladies-only")
+const { tours: ladiesOnly } = useTours({ category: "ladies-only", key: "ladies-live-tours" })
 
 const features = [
   { emoji: "🛡️", title: "Safe & Secure", desc: "Women guides, women drivers, and carefully vetted accommodations." },
@@ -19,7 +16,7 @@ const features = [
   <div>
     <section class="bg-dark-900 py-20">
       <div class="container-max px-4 text-center sm:px-6 lg:px-8">
-        <UiAppBadge label="Women Exclusive" variant="gold" />
+        <UiAppBadge label="Women Exclusive" />
         <h1 class="mt-3 font-heading text-4xl font-bold text-white lg:text-5xl">Ladies Only Tours</h1>
         <p class="mx-auto mt-4 max-w-xl text-lg text-gray-300">
           Travel safely, confidently, and joyfully with our exclusive women-only holiday packages — designed with your comfort and security at heart.
@@ -35,7 +32,7 @@ const features = [
             <p class="mt-1 text-sm text-gray-600">{{ feat.desc }}</p>
           </div>
         </div>
-        <ToursTourGrid :tours="ladiesOnly" />
+        <ToursTourGrid :tours="ladiesOnly ?? []" />
       </div>
     </section>
   </div>

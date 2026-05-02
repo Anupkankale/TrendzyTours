@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { tours } from "@/data/tours"
-
 useSeoMeta({
   title: "Holiday Packages | Trendzy Tours",
   description: "Browse all holiday packages — domestic, international, cruise, and ladies-only tours from Trendzy Tours, Nagpur.",
 })
+
+const { tours } = useTours({ key: "all-live-tours" })
 
 const categories = [
   { slug: "domestic", label: "Domestic", description: "Explore the best of India", href: "/holidays/domestic" },
@@ -38,7 +38,7 @@ const categories = [
           </NuxtLink>
         </div>
         <UiAppSectionTitle title="All Tours" />
-        <ToursTourGrid :tours="tours" />
+        <ToursTourGrid :tours="tours ?? []" />
       </div>
     </section>
   </div>

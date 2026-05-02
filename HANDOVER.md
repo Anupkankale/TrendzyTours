@@ -1,218 +1,176 @@
 # Trendzy Tours — Project Handover
 
----
+**Date:** 2026-04-30  
+**Project Root:** `/home/anupkankale/projects/tour-nuxt`
 
-**Date:** 2026-04-28
-**Time:** 11:30 IST (UTC+5:30)
-**Author:** Anup Kankale
+## Current State
 
----
+The project is a Nuxt 3 frontend with a Laravel backend in `backend/`, running locally through Laravel Sail on `http://localhost:8888`.
 
-## Current Work (Active)
+Phase 1 is still in progress in [PLAN.md](/home/anupkankale/projects/tour-nuxt/PLAN.md:1):
+- Feature 1 — Bookings dashboard: complete
+- Feature 2 — Tours CRUD dashboard: complete
+- Feature 3 — Blog CMS: next
+- Feature 4 — Users management: pending
 
-### Feature 1 — Bookings Dashboard (COMPLETE)
+## What Was Completed Recently
 
-Full bookings management added to the dashboard for `admin` and `sales` roles.
+### 1. Tours CRUD Dashboard
 
-**What was built:**
-1. **Bookings list page** (`/dashboard/bookings`) — searchable table with status + date-range filters, stat cards (Total / Pending / Confirmed / Cancelled)
-2. **Booking detail page** (`/dashboard/bookings/[id]`) — customer info, status update panel, email + WhatsApp quick actions, source badge
-3. **New Booking modal** — admin/sales can manually create a booking (phone call, reference, walk-in) directly from the dashboard without a website form
+Admin-only tours management was added:
+- `/dashboard/tours`
+- `/dashboard/tours/create`
+- `/dashboard/tours/[id]/edit`
 
-**Key files:**
-- `pages/dashboard/bookings/index.vue` — list page with filters + New Booking modal
-- `pages/dashboard/bookings/[id].vue` — detail page with status update
-- `stores/bookings.ts` — Pinia store (`fetchBookings`, `createBooking`, `updateStatus`, `fetchTourOptions`)
-- `types/booking.ts` — `Booking` interface, `BookingStatus`, `BookingSource` types
-- `backend/app/Http/Controllers/BookingController.php` — `index`, `store`, `show`, `update`
-- `backend/app/Models/Booking.php` — Eloquent model with `tour()` BelongsTo
-- `backend/app/Http/Resources/BookingResource.php` — JSON response (camelCase)
-- `backend/database/migrations/2024_01_01_000010_create_bookings_table.php` — bookings schema
-- `backend/database/migrations/2024_01_01_000011_add_source_to_bookings_table.php` — added source column
-- `backend/database/seeders/BookingSeeder.php` — 8 sample bookings across statuses
+Key files:
+- [pages/dashboard/tours/index.vue](/home/anupkankale/projects/tour-nuxt/pages/dashboard/tours/index.vue:1)
+- [pages/dashboard/tours/create.vue](/home/anupkankale/projects/tour-nuxt/pages/dashboard/tours/create.vue:1)
+- [pages/dashboard/tours/[id]/edit.vue](/home/anupkankale/projects/tour-nuxt/pages/dashboard/tours/[id]/edit.vue:1)
+- [components/dashboard/TourForm.vue](/home/anupkankale/projects/tour-nuxt/components/dashboard/TourForm.vue:1)
+- [stores/tours.ts](/home/anupkankale/projects/tour-nuxt/stores/tours.ts:1)
+- [backend/app/Http/Controllers/TourController.php](/home/anupkankale/projects/tour-nuxt/backend/app/Http/Controllers/TourController.php:1)
+- [backend/routes/api.php](/home/anupkankale/projects/tour-nuxt/backend/routes/api.php:1)
 
-**Booking source values:** `website | call | reference | walk-in`
-**Booking status values:** `pending | confirmed | cancelled`
+Backend admin tour endpoints:
+- `GET /api/admin/tours`
+- `POST /api/admin/tours`
+- `GET /api/admin/tours/{id}`
+- `PUT /api/admin/tours/{id}`
+- `DELETE /api/admin/tours/{id}`
 
-**To apply on a fresh DB:**
+### 2. Live / Not Live Tour Visibility
+
+The intended workflow is now toggle-based, not delete-based.
+
+Behavior:
+- tours marked live are shown on public pages
+- tours marked not live are hidden from public pages
+- the dashboard list labels this state as `Live` / `Not Live`
+
+Public tour API behavior:
+- [TourController.php](/home/anupkankale/projects/tour-nuxt/backend/app/Http/Controllers/TourController.php:1) now only returns tours with `published_at` set for:
+  - `GET /api/tours`
+  - `GET /api/tours/{slug}`
+
+### 3. Public Pages Moved To Backend Tour API
+
+Several pages previously read from `data/tours.ts`. They now use the backend API:
+- [components/home/FeaturedTours.vue](/home/anupkankale/projects/tour-nuxt/components/home/FeaturedTours.vue:1)
+- [pages/holidays/index.vue](/home/anupkankale/projects/tour-nuxt/pages/holidays/index.vue:1)
+- [pages/holidays/domestic.vue](/home/anupkankale/projects/tour-nuxt/pages/holidays/domestic.vue:1)
+- [pages/holidays/world-travellers.vue](/home/anupkankale/projects/tour-nuxt/pages/holidays/world-travellers.vue:1)
+- [pages/holidays/cruise-tours.vue](/home/anupkankale/projects/tour-nuxt/pages/holidays/cruise-tours.vue:1)
+- [pages/holidays/ladies-only.vue](/home/anupkankale/projects/tour-nuxt/pages/holidays/ladies-only.vue:1)
+- [pages/destinations/[region]/index.vue](/home/anupkankale/projects/tour-nuxt/pages/destinations/[region]/index.vue:1)
+- [pages/tours/[slug].vue](/home/anupkankale/projects/tour-nuxt/pages/tours/[slug].vue:1)
+
+Shared query helper:
+- [composables/useTours.ts](/home/anupkankale/projects/tour-nuxt/composables/useTours.ts:1)
+
+SSR-safe API helper:
+- [composables/useApi.ts](/home/anupkankale/projects/tour-nuxt/composables/useApi.ts:1)
+
+### 4. Safer Tour Deletion
+
+Even though the dashboard no longer centers deletion, the backend still guards against data loss.
+
+Important rule:
+- tours with existing bookings cannot be deleted
+
+Reason:
+- `bookings.tour_id` cascades on delete in the DB schema
+- deleting a booked tour would otherwise wipe bookings
+
+Guard location:
+- [backend/app/Http/Controllers/TourController.php](/home/anupkankale/projects/tour-nuxt/backend/app/Http/Controllers/TourController.php:1)
+
+### 5. Local Docs Added
+
+A short local backend quickstart was added:
+- [docs/backend-local.md](/home/anupkankale/projects/tour-nuxt/docs/backend-local.md:1)
+- linked from [docs/README.md](/home/anupkankale/projects/tour-nuxt/docs/README.md:1)
+
+## Important Local Fixes Applied
+
+### Backend Session Fix
+
+The backend had a local runtime issue because `SESSION_DRIVER=database` was set but there is no `sessions` table migration in this repo.
+
+Local fix:
+- [backend/.env](/home/anupkankale/projects/tour-nuxt/backend/.env:1) should use:
+  - `SESSION_DRIVER=file`
+
+If the backend starts failing again with a `sessions` table error, run:
+
 ```bash
 cd backend
-./vendor/bin/sail artisan migrate
-./vendor/bin/sail artisan db:seed --class=BookingSeeder
+./vendor/bin/sail artisan optimize:clear
+./vendor/bin/sail restart
 ```
 
----
+### Nuxt Image / IPX Fix
 
-### Previous Work — Contact Form Brevo SMTP OTP Verification (COMPLETE)
+The frontend was throwing 500s for remote Unsplash images via `/_ipx/...`.
 
-The contact form at `/contact` requires email verification before a lead is submitted. Verification uses a **6-digit OTP sent via Brevo SMTP**.
+Local fix:
+- [nuxt.config.ts](/home/anupkankale/projects/tour-nuxt/nuxt.config.ts:1) now sets:
+  - `image.provider = "none"`
 
-**How it works:**
-1. User enters email → clicks **Send OTP**
-2. Backend sends a 6-digit code to their inbox (expires in 10 minutes, max 3 requests per 10 minutes)
-3. Six individual digit boxes appear — user types the code, auto-verifies on the 6th digit
-4. Correct OTP → green ✓, boxes turn green, email field shows "Verified"
-5. Wrong OTP → red ✗, boxes shake and clear after 1.5s for retry
-6. User fills the rest of the form and submits — lead is created in the database
+This avoids local IPX proxy failures in development.
 
-**Key files:**
-- `composables/useContactForm.ts` — OTP send/verify flow, stores `email_token` after verification
-- `pages/contact.vue` — contact form UI, uses `<UiAppOtpInput>` for the code entry
-- `components/ui/AppOtpInput.vue` — 6-box PIN input component (auto-focus, paste, auto-verify)
-- `backend/app/Http/Controllers/OtpController.php` — `POST /api/otp/send` and `POST /api/otp/verify`
-- `backend/app/Services/EmailOtpService.php` — sends OTP email via Laravel `Mail::html()` (Brevo SMTP)
-- `backend/app/Http/Controllers/ContactController.php` — validates `email_token`, creates `Lead`, sends admin notification
+## Current Environment Expectations
 
-**Important Brevo SMTP credential note:**
-The SMTP login is NOT the Brevo account email. It is a system-assigned address shown at:
-**Brevo → Settings → SMTP & API → SMTP tab → "Login"**
+Frontend root `.env`:
 
-```
-MAIL_USERNAME=a8a8c5001@smtp-brevo.com   ← system login, not account email
-MAIL_PASSWORD=xsmtpsib-...               ← SMTP key generated in Brevo dashboard
-MAIL_FROM_ADDRESS=tradestrome@gmail.com  ← must be a verified sender in Brevo
-```
-
----
-
-## Project Scope
-
-### Trendzy Tours — Travel Agency Website
-**Domain:** trendzytours.com | **Location:** Nagpur, India
-
-### Iteration 1 — Public Website (Complete)
-| Page | Route | Status |
-|------|-------|--------|
-| Home | `/` | Done |
-| About | `/about` | Done |
-| Tours listing | `/tours` | Done |
-| Tour detail | `/tours/[slug]` | Done |
-| Destinations | `/destinations` | Done |
-| Holidays | `/holidays` | Done |
-| Blog | `/blog` | Done |
-| Contact form | `/contact` | Done — Brevo SMTP OTP verified |
-| Login | `/login` | Done |
-
-### Iteration 2 — Role-Based Dashboard (In Progress)
-| Page | Route | Status |
-|------|-------|--------|
-| Dashboard home | `/dashboard` | Scaffolded — stat cards are hardcoded, not wired to DB |
-| Leads list | `/dashboard/leads` | Working — search, filter, stat cards, Add Lead modal |
-| Lead detail | `/dashboard/leads/[id]` | Working — notes timeline, status change, quick actions |
-| Bookings list | `/dashboard/bookings` | Working — search, status/date filter, stat cards, New Booking modal |
-| Booking detail | `/dashboard/bookings/[id]` | Working — status update, email/WhatsApp actions, source badge |
-
-**Roles:** `admin`, `sales`, `customer`, `seo`
-**Auth:** JWT cookie — `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/me`
-**Access control:** `middleware/auth.ts` + `middleware/role.ts`
-
-### Iteration 2 — Remaining (see PLAN.md)
-| Feature | Route | Priority |
-|---------|-------|----------|
-| Tours CRUD | `/dashboard/tours` | High |
-| Blog CMS | `/dashboard/blog` | High |
-| Users management | `/dashboard/users` | Medium |
-| Customer My Bookings | `/dashboard/my-bookings` | Medium |
-
----
-
-## Tech Stack
-
-### Frontend (Nuxt 3)
-- **Framework:** Nuxt 3.21.2 + TypeScript
-- **Styling:** Tailwind CSS 3 — brand (#1e6c93), gold, dark, cream palettes (all in `tailwind.config.ts`)
-- **Fonts:** Playfair Display (headings), Inter (body)
-- **State:** Pinia (`stores/auth.ts`, `stores/tours.ts`, `stores/ui.ts`, `stores/leads.ts`, `stores/bookings.ts`)
-- **Forms:** vee-validate + zod
-- **Content:** @nuxt/content — markdown blog posts in `content/blog/`
-- **Images:** @nuxt/image (webp/avif)
-
-### Backend (Laravel — `backend/`)
-- **Framework:** Laravel (PHP), Docker/Sail on port `8888`
-- **Auth:** JWT (`tymon/jwt-auth`) + custom `ParseJwtFromCookie` middleware
-- **OTP emails:** Laravel `Mail::html()` → Brevo SMTP (`smtp-relay.brevo.com:587`)
-- **Lead notification emails:** Brevo REST API (`BREVO_API_KEY`)
-- **Database:** MySQL (Docker, port 3307 on host)
-
-### API Endpoints
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| GET | `/api/tours` | Public | All tours |
-| GET | `/api/tours/{slug}` | Public | Single tour |
-| POST | `/api/otp/send` | Public | Send 6-digit OTP (rate limited: 3/10 min) |
-| POST | `/api/otp/verify` | Public | Verify OTP → returns `email_token` UUID |
-| POST | `/api/contact` | Public | Validate `email_token`, create Lead, notify admin |
-| POST | `/api/newsletter` | Public | Newsletter signup (Brevo) |
-| POST | `/api/auth/login` | Public | Login → JWT cookie |
-| POST | `/api/auth/logout` | Auth | Clear session |
-| GET | `/api/auth/me` | Auth | Current user |
-| GET | `/api/leads` | admin, sales | List leads |
-| POST | `/api/leads` | admin, sales | Create lead manually |
-| GET | `/api/leads/{id}` | admin, sales | Lead detail |
-| PUT | `/api/leads/{id}` | admin, sales | Update status or add note |
-| GET | `/api/bookings` | admin, sales | List all bookings |
-| POST | `/api/bookings` | admin, sales | Create manual booking (call/reference/walk-in) |
-| GET | `/api/bookings/{id}` | admin, sales | Booking detail |
-| PUT | `/api/bookings/{id}` | admin, sales | Update booking status |
-
----
-
-## Environment Setup
-
-### Frontend `.env` (project root)
-```
+```env
 NUXT_PUBLIC_API_BASE=http://localhost:8888
 ```
 
-### Backend `.env` (`backend/.env`)
-```
-# Database
-DB_CONNECTION=mysql
-DB_HOST=mysql
-DB_PORT=3306
-DB_DATABASE=laravel
-DB_USERNAME=sail
-DB_PASSWORD=password
+Backend key local expectations:
 
-# JWT
-JWT_SECRET=...
-
-# Brevo SMTP — OTP emails to users
-MAIL_MAILER=smtp
-MAIL_HOST=smtp-relay.brevo.com
-MAIL_PORT=587
-MAIL_USERNAME=a8a8c5001@smtp-brevo.com
-MAIL_PASSWORD=xsmtpsib-...
-MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS=tradestrome@gmail.com
-MAIL_FROM_NAME="Trendzy Tours"
-
-# Brevo REST API — admin notification on new lead
-BREVO_API_KEY=xkeysib-...
-
+```env
 APP_PORT=8888
+DB_DATABASE=laravel
+SESSION_DRIVER=file
 ```
 
-### Dev Commands
+## Local Run Commands
+
+Frontend:
+
 ```bash
-# Frontend — always run from project root
-npm run dev        # http://localhost:3000
-
-# Backend — always use Sail, never plain php artisan (DB is inside Docker)
-cd backend
-./vendor/bin/sail up -d                          # Start containers
-./vendor/bin/sail artisan migrate                # Run new migrations
-./vendor/bin/sail artisan db:seed --class=XSeeder
-./vendor/bin/sail artisan config:clear
-
-# Test SMTP
-./vendor/bin/sail artisan tinker --execute="Mail::raw('Test', fn(\$m) => \$m->to('tradestrome@gmail.com')->subject('Test')); echo 'OK';"
+cd /home/anupkankale/projects/tour-nuxt
+npm run dev
 ```
 
----
+Backend:
 
-## Known Issues / Pending
-- **Dashboard home stat cards** are hardcoded — needs real DB queries once all features are wired
-- **`noreply@trendzytours.com`** not yet a verified sender in Brevo — currently using `tradestrome@gmail.com` as `MAIL_FROM_ADDRESS`
-- **Domain SPF/DKIM** not configured on trendzytours.com for Brevo — first emails may land in spam
-- **`php artisan` directly** will fail — MySQL lives inside Docker, always use `./vendor/bin/sail artisan`
+```bash
+cd /home/anupkankale/projects/tour-nuxt/backend
+./vendor/bin/sail up -d
+```
+
+Useful backend checks:
+
+```bash
+curl http://localhost:8888
+curl http://localhost:8888/api/tours
+curl "http://localhost:8888/api/tours?featured=true"
+```
+
+## Known Caveats
+
+- `/` is still prerendered in [nuxt.config.ts](/home/anupkankale/projects/tour-nuxt/nuxt.config.ts:1), so after data-path changes you may need to restart the Nuxt server to avoid stale homepage output.
+- Public tour visibility now depends on backend data. If homepage/holiday pages are empty, check whether tours are both:
+  - live
+  - featured, for homepage featured section
+- The wording in `PLAN.md` for Feature 2 still mentions delete with confirm modal, but the current product direction is moving toward live/not-live management instead.
+
+## Recommended Next Step
+
+Continue with Phase 1, Feature 3:
+- Blog CMS dashboard
+- routes:
+  - `/dashboard/blog`
+  - `/dashboard/blog/create`
+  - `/dashboard/blog/[id]/edit`

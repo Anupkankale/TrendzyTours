@@ -1,12 +1,28 @@
 <script setup lang="ts">
-import { tours } from "@/data/tours"
 import { CheckCircleIcon, XCircleIcon, CalendarIcon, UsersIcon } from "@heroicons/vue/24/outline"
 import { StarIcon } from "@heroicons/vue/20/solid"
+import type { Tour } from "@/types/tour"
+import { tours as fallbackTours } from "@/data/tours"
 
 const route = useRoute()
-const tour = tours.find((t) => t.slug === route.params.slug)
+const { apiFetch } = useApi()
+const { data: tour } = await useAsyncData<Tour | null>(
+  `tour-page-${route.params.slug}`,
+  async () => {
+    try {
+      return await apiFetch<Tour>(`/api/tours/${route.params.slug}`)
+    } catch {
+      return fallbackTours.find((item) => item.slug === route.params.slug) ?? null
+    }
+  },
+)
 
-if (!tour) throw createError({ statusCode: 404, statusMessage: "Tour not found" })
+if (!tour.value) throw createError({ statusCode: 404, statusMessage: "Tour not found" })
+
+const currentTour = computed<Tour>(() => {
+  if (!tour.value) throw createError({ statusCode: 404, statusMessage: "Tour not found" })
+  return tour.value
+})
 
 const openDay = ref<number | null>(null)
 
@@ -15,8 +31,8 @@ function toggleDay(day: number) {
 }
 
 useSeoMeta({
-  title: `${tour.name} – ${tour.duration} Nights | Trendzy Tours`,
-  description: tour.seoDescription,
+  title: `${currentTour.value.name} – ${currentTour.value.duration} Nights | Trendzy Tours`,
+  description: currentTour.value.seoDescription,
 })
 </script>
 
@@ -26,17 +42,17 @@ useSeoMeta({
     <section class="relative h-[60vh] min-h-80 bg-dark-950">
       <div class="absolute inset-0 bg-dark-900/50" />
       <NuxtImg
-        :src="tour.heroImage"
-        :alt="tour.name"
+        :src="currentTour.heroImage"
+        :alt="currentTour.name"
         class="absolute inset-0 h-full w-full object-cover"
         fetchpriority="high"
         loading="eager"
         :width="1920"
         :height="800" />
       <div class="container-max relative z-10 flex h-full flex-col justify-end px-4 pb-10 sm:px-6 lg:px-8">
-        <UiAppBadge :label="tour.category" class="mb-3" />
-        <h1 class="font-heading text-4xl font-bold text-white lg:text-5xl">{{ tour.name }}</h1>
-        <p class="mt-2 text-lg text-gray-200">{{ tour.destination }}</p>
+        <UiAppBadge :label="currentTour.category" class="mb-3" />
+        <h1 class="font-heading text-4xl font-bold text-white lg:text-5xl">{{ currentTour.name }}</h1>
+        <p class="mt-2 text-lg text-gray-200">{{ currentTour.destination }}</p>
       </div>
     </section>
 
@@ -49,21 +65,21 @@ useSeoMeta({
           <div class="mb-8 flex flex-wrap gap-4">
             <div class="flex items-center gap-2 rounded-xl bg-cream-100 px-4 py-2">
               <CalendarIcon class="h-5 w-5 text-gold-600" />
-              <span class="text-sm font-medium">{{ tour.duration }} Nights</span>
+              <span class="text-sm font-medium">{{ currentTour.duration }} Nights</span>
             </div>
             <div class="flex items-center gap-2 rounded-xl bg-cream-100 px-4 py-2">
               <UsersIcon class="h-5 w-5 text-gold-600" />
-              <span class="text-sm font-medium">{{ tour.groupSize.min }}–{{ tour.groupSize.max }} pax</span>
+              <span class="text-sm font-medium">{{ currentTour.groupSize.min }}–{{ currentTour.groupSize.max }} pax</span>
             </div>
           </div>
 
-          <p class="text-gray-700 leading-relaxed">{{ tour.description }}</p>
+          <p class="text-gray-700 leading-relaxed">{{ currentTour.description }}</p>
 
           <!-- Highlights -->
           <div class="mt-8">
             <h2 class="font-heading text-xl font-bold text-dark-900">Tour Highlights</h2>
             <ul class="mt-4 grid gap-2 sm:grid-cols-2">
-              <li v-for="h in tour.highlights" :key="h" class="flex items-start gap-2 text-sm text-gray-700">
+              <li v-for="h in currentTour.highlights" :key="h" class="flex items-start gap-2 text-sm text-gray-700">
                 <StarIcon class="mt-0.5 h-4 w-4 flex-shrink-0 text-gold-500" />
                 {{ h }}
               </li>
@@ -75,7 +91,7 @@ useSeoMeta({
             <h2 class="font-heading text-xl font-bold text-dark-900">Day-by-Day Itinerary</h2>
             <div class="mt-4 space-y-3">
               <div
-                v-for="day in tour.itinerary"
+                v-for="day in currentTour.itinerary"
                 :key="day.day"
                 class="overflow-hidden rounded-xl border border-gray-200">
                 <button
@@ -99,7 +115,7 @@ useSeoMeta({
             <div>
               <h2 class="font-heading text-xl font-bold text-dark-900">Inclusions</h2>
               <ul class="mt-4 space-y-2">
-                <li v-for="inc in tour.inclusions" :key="inc" class="flex items-start gap-2 text-sm text-gray-700">
+                <li v-for="inc in currentTour.inclusions" :key="inc" class="flex items-start gap-2 text-sm text-gray-700">
                   <CheckCircleIcon class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-500" />
                   {{ inc }}
                 </li>
@@ -108,7 +124,7 @@ useSeoMeta({
             <div>
               <h2 class="font-heading text-xl font-bold text-dark-900">Exclusions</h2>
               <ul class="mt-4 space-y-2">
-                <li v-for="exc in tour.exclusions" :key="exc" class="flex items-start gap-2 text-sm text-gray-700">
+                <li v-for="exc in currentTour.exclusions" :key="exc" class="flex items-start gap-2 text-sm text-gray-700">
                   <XCircleIcon class="mt-0.5 h-4 w-4 flex-shrink-0 text-red-400" />
                   {{ exc }}
                 </li>
@@ -121,20 +137,20 @@ useSeoMeta({
         <div class="lg:sticky lg:top-24 lg:self-start">
           <div class="rounded-2xl bg-cream-100 p-6 shadow-md">
             <p class="text-sm text-gray-500">Starting from</p>
-            <p class="font-heading text-4xl font-bold text-gold-600">₹{{ tour.pricePerPerson.toLocaleString("en-IN") }}</p>
+            <p class="font-heading text-4xl font-bold text-gold-600">₹{{ currentTour.pricePerPerson.toLocaleString("en-IN") }}</p>
             <p class="text-sm text-gray-500">per person</p>
             <div class="my-6 space-y-2 text-sm">
-              <div class="flex justify-between"><span class="text-gray-600">Duration</span><span class="font-medium">{{ tour.duration }} Nights</span></div>
-              <div class="flex justify-between"><span class="text-gray-600">Group Size</span><span class="font-medium">{{ tour.groupSize.min }}–{{ tour.groupSize.max }} pax</span></div>
-              <div class="flex justify-between"><span class="text-gray-600">Destination</span><span class="font-medium">{{ tour.destination }}</span></div>
+              <div class="flex justify-between"><span class="text-gray-600">Duration</span><span class="font-medium">{{ currentTour.duration }} Nights</span></div>
+              <div class="flex justify-between"><span class="text-gray-600">Group Size</span><span class="font-medium">{{ currentTour.groupSize.min }}–{{ currentTour.groupSize.max }} pax</span></div>
+              <div class="flex justify-between"><span class="text-gray-600">Destination</span><span class="font-medium">{{ currentTour.destination }}</span></div>
             </div>
             <NuxtLink
-              :to="`/contact?tour=${encodeURIComponent(tour.name)}`"
+              :to="`/contact?tour=${encodeURIComponent(currentTour.name)}`"
               class="block w-full rounded-full bg-gold-500 py-3 text-center font-semibold text-white shadow transition hover:bg-gold-600">
               Book This Tour
             </NuxtLink>
             <a
-              :href="`https://wa.me/917123578454?text=Hi%2C%20I%27d%20like%20to%20enquire%20about%20${encodeURIComponent(tour.name)}`"
+              :href="`https://wa.me/917123578454?text=Hi%2C%20I%27d%20like%20to%20enquire%20about%20${encodeURIComponent(currentTour.name)}`"
               target="_blank"
               rel="noopener"
               class="mt-3 flex items-center justify-center gap-2 rounded-full border-2 border-green-500 py-3 text-center text-sm font-semibold text-green-600 transition hover:bg-green-50">

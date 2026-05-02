@@ -1,7 +1,12 @@
 <script setup lang="ts">
-import { tours } from "@/data/tours"
+import { tours as fallbackTours } from "@/data/tours"
 
-const featured = tours.filter((t) => t.featured)
+const { tours: featured } = useTours({ featured: true, key: "featured-tours" })
+
+const displayTours = computed(() => {
+  if (featured.value?.length) return featured.value
+  return fallbackTours.filter((tour) => tour.featured && tour.publishedAt)
+})
 </script>
 
 <template>
@@ -21,7 +26,7 @@ const featured = tours.filter((t) => t.featured)
           </svg>
         </NuxtLink>
       </div>
-      <ToursTourGrid :tours="featured" />
+      <ToursTourGrid :tours="displayTours" />
       <!-- Mobile view-all -->
       <div class="mt-8 flex justify-center sm:hidden">
         <UiAppButton href="/holidays" variant="secondary" icon-right>View all holidays</UiAppButton>

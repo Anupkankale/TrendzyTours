@@ -31,6 +31,7 @@ export default defineNuxtConfig({
   },
 
   image: {
+    provider: "none",
     domains: ["trendzytours.com", "images.unsplash.com"],
     formats: ["webp", "avif"],
     quality: 85,

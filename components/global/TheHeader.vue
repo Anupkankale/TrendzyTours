@@ -13,9 +13,7 @@ const ui = useUIStore()
     <nav class="container-max flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
       <!-- Logo -->
       <NuxtLink to="/" class="flex items-center gap-2">
-        <span class="font-heading text-xl font-bold text-brand-900">
-          Trendzy<span class="text-brand-500">Tours</span>
-        </span>
+        <NuxtImg src="/images/tours/logo/TrendzyTourslogo.png" alt="Trendzy Tours" class="h-12 w-auto" />
       </NuxtLink>
 
       <!-- Desktop nav -->

@@ -30,7 +30,7 @@ useSeoMeta({ title: "Login | Trendzy Tours", robots: "noindex" })
     <div class="w-full max-w-md">
       <div class="text-center mb-8">
         <NuxtLink to="/" class="font-heading text-2xl font-bold text-white">
-          Trendzy<span class="text-gold-500">Tours</span>
+          <img src="/images/tours/logo/TrendzyTours-logo-white.png" alt="Trendzy Tours" class="h-10 w-auto mx-auto" />
         </NuxtLink>
         <p class="mt-2 text-gray-400 text-sm">Staff Login</p>
       </div>
