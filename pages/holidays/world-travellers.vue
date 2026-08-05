@@ -1,9 +1,17 @@
 <script setup lang="ts">
-useSeoMeta({
-  title: "International Holiday Packages | Trendzy Tours",
+useSeo({
+  title: "International Holiday Packages",
   description: "Explore the world with Trendzy Tours. International holiday packages to Europe, Asia, Africa, and beyond from Nagpur.",
 })
 const { tours: international } = useTours({ category: "world-travellers", key: "world-live-tours" })
+
+useJsonLd(
+  breadcrumbSchema([
+    { name: "Holiday Packages", path: "/holidays" },
+    { name: "World Travellers", path: "/holidays/world-travellers" },
+  ]),
+  tourListSchema(international.value ?? [], "International Holiday Packages"),
+)
 </script>
 
 <template>

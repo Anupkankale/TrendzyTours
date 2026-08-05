@@ -7,10 +7,20 @@ const region = regions.find((r) => r.slug === route.params.region)
 if (!region) throw createError({ statusCode: 404, statusMessage: "Region not found" })
 const { tours: regionTours } = useTours({ region: region.slug, key: `region-${region.slug}-live-tours` })
 
-useSeoMeta({
-  title: `${region.name} Tour Packages | Trendzy Tours`,
+useSeo({
+  title: `${region.name} Tour Packages`,
   description: `Explore ${region.name} with Trendzy Tours. Handpicked holiday packages to ${region.featured.slice(0, 3).join(", ")} and more.`,
+  image: region.image,
+  canonicalPath: `/destinations/${region.slug}`,
 })
+
+useJsonLd(
+  breadcrumbSchema([
+    { name: "Destinations", path: "/destinations" },
+    { name: region.name, path: `/destinations/${region.slug}` },
+  ]),
+  tourListSchema(regionTours.value ?? [], `${region.name} Tour Packages`),
+)
 </script>
 
 <template>

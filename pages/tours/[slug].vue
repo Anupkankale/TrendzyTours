@@ -30,10 +30,20 @@ function toggleDay(day: number) {
   openDay.value = openDay.value === day ? null : day
 }
 
-useSeoMeta({
-  title: `${currentTour.value.name} – ${currentTour.value.duration} Nights | Trendzy Tours`,
-  description: currentTour.value.seoDescription,
+useSeo({
+  title: `${currentTour.value.name} – ${currentTour.value.duration} Nights`,
+  description: currentTour.value.seoDescription || currentTour.value.shortDescription,
+  image: currentTour.value.heroImage,
+  canonicalPath: `/tours/${currentTour.value.slug}`,
 })
+
+useJsonLd(
+  tourSchema(currentTour.value),
+  breadcrumbSchema([
+    { name: "Holiday Packages", path: "/holidays" },
+    { name: currentTour.value.name, path: `/tours/${currentTour.value.slug}` },
+  ]),
+)
 </script>
 
 <template>

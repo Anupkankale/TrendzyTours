@@ -1,9 +1,17 @@
 <script setup lang="ts">
-useSeoMeta({
-  title: "Domestic Holiday Packages | Trendzy Tours",
+useSeo({
+  title: "Domestic Holiday Packages",
   description: "Explore India with our handcrafted domestic tour packages. Rajasthan, Sikkim, Kerala, and more from Nagpur.",
 })
 const { tours: domestic } = useTours({ category: "domestic", key: "domestic-live-tours" })
+
+useJsonLd(
+  breadcrumbSchema([
+    { name: "Holiday Packages", path: "/holidays" },
+    { name: "Domestic", path: "/holidays/domestic" },
+  ]),
+  tourListSchema(domestic.value ?? [], "Domestic Holiday Packages"),
+)
 </script>
 
 <template>

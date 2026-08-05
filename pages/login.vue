@@ -22,7 +22,11 @@ async function handleLogin() {
   }
 }
 
-useSeoMeta({ title: "Login | Trendzy Tours", robots: "noindex" })
+useSeo({
+  title: "Login",
+  description: "Sign in to your Trendzy Tours account.",
+  noindex: true,
+})
 </script>
 
 <template>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-useSeoMeta({
-  title: "Terms of Service | Trendzy Tours",
+useSeo({
+  title: "Terms of Service",
   description:
     "Review the Trendzy Tours terms of service covering bookings, payments, cancellations, and your responsibilities as a traveller.",
 })

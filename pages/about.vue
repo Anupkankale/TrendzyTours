@@ -1,9 +1,11 @@
 <script setup lang="ts">
-useSeoMeta({
-  title: "About Us | Trendzy Tours",
+useSeo({
+  title: "About Us",
   description:
     "Learn about Trendzy Tours — Nagpur's trusted travel agency with 15+ years of crafting unforgettable holiday experiences across India and the world.",
 })
+
+useJsonLd(breadcrumbSchema([{ name: "About Us", path: "/about" }]))
 
 const values = [
   { icon: "🌍", title: "Passion for Travel", description: "We are travellers first. Our team has personally experienced the destinations we recommend." },

@@ -1,11 +1,13 @@
 <script setup lang="ts">
-useSeoMeta({
+useSeo({
   title: "Trendzy Tours — Your Journey, Our Promise",
+  titleRaw: true,
   description:
     "India's trusted travel agency for domestic, international, cruise, and ladies-only holiday packages. Book from Nagpur with confidence.",
-  ogTitle: "Trendzy Tours — Your Journey, Our Promise",
-  ogDescription: "Explore the world with Trendzy Tours. Expert-curated holiday packages from Nagpur.",
 })
+
+// Organisation + site identity: emitted once, here, and referenced by @id elsewhere.
+useJsonLd(travelAgencySchema(), webSiteSchema())
 </script>
 
 <template>
