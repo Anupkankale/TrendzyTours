@@ -32,6 +32,42 @@ const { email, subscribe, isSubscribed } = useNewsletterForm()
 </script>
 ```
 
+## `useSeo.ts`
+
+Sets every head tag a public page needs in one call: title, description,
+canonical, Open Graph, Twitter Card, and the robots directive. Also exports
+`useSiteUrl()` and `useAbsoluteUrl()`.
+
+**Usage:**
+```vue
+<script setup>
+useSeo({
+  title: "Domestic Holiday Packages",
+  description: "Explore India with our handcrafted domestic tour packages.",
+})
+</script>
+```
+
+See [seo.md](seo.md) for all options.
+
+## `useJsonLd.ts`
+
+Injects JSON-LD structured data, plus the schema builders
+(`travelAgencySchema`, `tourSchema`, `breadcrumbSchema`, `articleSchema`,
+`tourListSchema`, `webSiteSchema`).
+
+**Usage:**
+```vue
+<script setup>
+useJsonLd(
+  tourSchema(tour),
+  breadcrumbSchema([{ name: tour.name, path: `/tours/${tour.slug}` }]),
+)
+</script>
+```
+
+See [seo.md](seo.md) for the builder reference.
+
 ## `useTours.ts`
 
 Composable layer over the `tours` Pinia store.
