@@ -43,8 +43,8 @@ export const tours: Tour[] = [
     duration: 10,
     groupSize: { min: 2, max: 25 },
     pricePerPerson: 42000,
-    heroImage: "https://images.unsplash.com/photo-1477587458883-47145ed94373?w=800&q=85&auto=format&fit=crop",
-    gallery: ["https://images.unsplash.com/photo-1477587458883-47145ed94373?w=800&q=85&auto=format&fit=crop"],
+    heroImage: "https://images.unsplash.com/photo-1695395550316-8995ae9d35ff?w=800&q=85&auto=format&fit=crop",
+    gallery: ["https://images.unsplash.com/photo-1695395550316-8995ae9d35ff?w=800&q=85&auto=format&fit=crop"],
     shortDescription: "Palaces, forts, and the golden desert of the Land of Kings.",
     description:
       "Step into a world of maharajas on this royal Rajasthan circuit covering Jaipur, Jodhpur, Jaisalmer, and Udaipur. Experience camel safaris, heritage hotel stays, and vibrant bazaars.",

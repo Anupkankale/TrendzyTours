@@ -88,7 +88,7 @@ const offers = [
     originalPrice: 50000,
     salePrice: 42000,
     discount: "16% OFF",
-    image: "https://images.unsplash.com/photo-1477587458883-47145ed94373?w=600&q=85&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1695395550316-8995ae9d35ff?w=600&q=85&auto=format&fit=crop",
     href: "/tours/rajasthan-royal-10-nights",
   },
   {

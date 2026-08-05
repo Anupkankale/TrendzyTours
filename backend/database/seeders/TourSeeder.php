@@ -54,7 +54,7 @@ class TourSeeder extends Seeder
                 'group_size_min'    => 2,
                 'group_size_max'    => 25,
                 'price_per_person'  => 42000,
-                'hero_image'        => 'https://images.unsplash.com/photo-1477587458883-47145ed94373?w=800&q=85&auto=format&fit=crop',
+                'hero_image'        => 'https://images.unsplash.com/photo-1695395550316-8995ae9d35ff?w=800&q=85&auto=format&fit=crop',
                 'short_description' => 'Palaces, forts, and the golden desert of the Land of Kings.',
                 'description'       => 'Step into a world of maharajas on this royal Rajasthan circuit covering Jaipur, Jodhpur, Jaisalmer, and Udaipur. Experience camel safaris, heritage hotel stays, and vibrant bazaars.',
                 'seo_description'   => 'Rajasthan tour packages from Nagpur. 10 nights across Jaipur, Jodhpur, Jaisalmer & Udaipur from ₹42,000.',
@@ -63,7 +63,7 @@ class TourSeeder extends Seeder
                 'exclusions'        => ['Flights to/from Jaipur', 'Personal expenses'],
                 'featured'          => true,
                 'published_at'      => '2025-01-15',
-                'gallery'           => ['https://images.unsplash.com/photo-1537953773345-d172ccf13cf1?w=800&q=85&auto=format&fit=crop'],
+                'gallery'           => ['https://images.unsplash.com/photo-1695395550316-8995ae9d35ff?w=800&q=85&auto=format&fit=crop'],
                 'itinerary'         => [
                     ['day' => 1,  'title' => 'Arrive Jaipur',          'description' => 'Pink City welcome, Hawa Mahal visit.',                              'meals' => ['Dinner'],              'accommodation' => null],
                     ['day' => 2,  'title' => 'Jaipur Forts',           'description' => 'Amber Fort, City Palace, Jantar Mantar.',                            'meals' => ['Breakfast', 'Dinner'], 'accommodation' => null],
