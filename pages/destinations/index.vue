@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { regions } from "@/data/destinations"
 
-useSeoMeta({
-  title: "Travel Destinations | Trendzy Tours",
+useSeo({
+  title: "Travel Destinations",
   description: "Explore tour destinations by region — Asia, Europe, Africa, Oceania, Latin America, and North America with Trendzy Tours.",
 })
+
+useJsonLd(breadcrumbSchema([{ name: "Destinations", path: "/destinations" }]))
 </script>
 
 <template>

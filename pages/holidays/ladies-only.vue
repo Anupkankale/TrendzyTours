@@ -1,9 +1,17 @@
 <script setup lang="ts">
-useSeoMeta({
-  title: "Ladies Only Tours | Trendzy Tours",
+useSeo({
+  title: "Ladies Only Tours",
   description: "Safe, curated travel experiences exclusively for women. Ladies only holiday packages from Trendzy Tours, Nagpur.",
 })
 const { tours: ladiesOnly } = useTours({ category: "ladies-only", key: "ladies-live-tours" })
+
+useJsonLd(
+  breadcrumbSchema([
+    { name: "Holiday Packages", path: "/holidays" },
+    { name: "Ladies Only", path: "/holidays/ladies-only" },
+  ]),
+  tourListSchema(ladiesOnly.value ?? [], "Ladies Only Tours"),
+)
 
 const features = [
   { emoji: "🛡️", title: "Safe & Secure", desc: "Women guides, women drivers, and carefully vetted accommodations." },

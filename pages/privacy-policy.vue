@@ -1,6 +1,6 @@
 <script setup lang="ts">
-useSeoMeta({
-  title: "Privacy Policy | Trendzy Tours",
+useSeo({
+  title: "Privacy Policy",
   description:
     "Read the Trendzy Tours privacy policy — how we collect, use, and protect your personal information when you book holidays and travel packages with us.",
 })

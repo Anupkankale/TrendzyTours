@@ -1,9 +1,17 @@
 <script setup lang="ts">
-useSeoMeta({
-  title: "Cruise Tour Packages | Trendzy Tours",
+useSeo({
+  title: "Cruise Tour Packages",
   description: "Luxury and river cruise packages from Trendzy Tours. Mediterranean, Caribbean, and river cruises for Indian travellers.",
 })
 const { tours: cruises } = useTours({ category: "cruise", key: "cruise-live-tours" })
+
+useJsonLd(
+  breadcrumbSchema([
+    { name: "Holiday Packages", path: "/holidays" },
+    { name: "Cruise Tours", path: "/holidays/cruise-tours" },
+  ]),
+  tourListSchema(cruises.value ?? [], "Cruise Tour Packages"),
+)
 </script>
 
 <template>

@@ -2,10 +2,12 @@
 import { useContactForm } from "@/composables/useContactForm"
 import { PhoneIcon, EnvelopeIcon, MapPinIcon } from "@heroicons/vue/24/outline"
 
-useSeoMeta({
-  title: "Contact Us | Trendzy Tours",
+useSeo({
+  title: "Contact Us",
   description: "Get in touch with Trendzy Tours, Nagpur. Call, email, or fill our inquiry form to plan your perfect holiday.",
 })
+
+useJsonLd(breadcrumbSchema([{ name: "Contact Us", path: "/contact" }]))
 
 const {
   name, nameProps, email, emailProps, phone, phoneProps,

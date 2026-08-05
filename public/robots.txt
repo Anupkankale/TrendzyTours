@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Private / non-indexable areas
+Disallow: /dashboard
+Disallow: /login
+Disallow: /_seo/
+Disallow: /_nuxt/
+
+Sitemap: https://trendzytours.com/sitemap_index.xml

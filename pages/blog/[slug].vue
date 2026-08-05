@@ -6,11 +6,33 @@ const { data: post } = await useAsyncData(`blog-${route.params.slug}`, () =>
 
 if (!post.value) throw createError({ statusCode: 404, statusMessage: "Post not found" })
 
-useSeoMeta({
-  title: `${post.value.title} | Trendzy Tours`,
-  description: post.value.description,
-  ogImage: post.value.image,
+// Frontmatter is untyped, so narrow to strings before feeding the SEO helpers.
+const meta = {
+  title: (post.value.title as string) ?? "Travel Blog",
+  description: (post.value.description as string) ?? "Travel tips and destination guides from Trendzy Tours.",
+  image: post.value.image as string | undefined,
+  publishedAt: post.value.publishedAt as string | undefined,
+  author: (post.value.author as string) ?? "Trendzy Tours Team",
+  path: `/blog/${route.params.slug}`,
+}
+
+useSeo({
+  title: meta.title,
+  description: meta.description,
+  image: meta.image,
+  type: "article",
+  publishedTime: meta.publishedAt,
+  author: meta.author,
+  canonicalPath: meta.path,
 })
+
+useJsonLd(
+  articleSchema(meta),
+  breadcrumbSchema([
+    { name: "Blog", path: "/blog" },
+    { name: meta.title, path: meta.path },
+  ]),
+)
 </script>
 
 <template>

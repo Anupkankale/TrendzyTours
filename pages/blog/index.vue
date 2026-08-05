@@ -1,8 +1,10 @@
 <script setup lang="ts">
-useSeoMeta({
-  title: "Travel Blog | Trendzy Tours",
+useSeo({
+  title: "Travel Blog",
   description: "Travel tips, destination guides, and holiday inspiration from the Trendzy Tours team. Plan your next adventure.",
 })
+
+useJsonLd(breadcrumbSchema([{ name: "Blog", path: "/blog" }]))
 
 const { data: posts } = await useAsyncData("blog-posts", () =>
   queryContent("blog").sort({ publishedAt: -1 }).find()
