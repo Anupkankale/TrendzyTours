@@ -14,5 +14,7 @@ Welcome to the Trendzy Tours documentation. This folder contains all project doc
 | [composables.md](composables.md) | Composables and their usage |
 | [middleware.md](middleware.md) | Route middleware documentation |
 | [styling.md](styling.md) | Tailwind CSS conventions and design tokens |
+| [seo.md](seo.md) | Technical SEO — meta, structured data, sitemap, robots |
 | [setup.md](setup.md) | Local development setup guide |
 | [backend-local.md](backend-local.md) | Short local quickstart for running the Laravel backend |
+| [changelog.md](changelog.md) | Notable changes and the reasoning behind them |

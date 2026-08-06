@@ -2,7 +2,13 @@
 
 ## About
 
-**Trendzy Tours** is a travel agency web application built with Nuxt 3. It allows users to browse tours and destinations, read travel blog content, contact the agency, and manage bookings via a protected dashboard.
+**Trendzy Tours** is a travel agency web application built with Nuxt 3, backed by
+a separate Laravel 12 API. It allows users to browse tours and destinations, read
+travel blog content, contact the agency, and manage bookings, leads and tours via
+a protected role-based dashboard.
+
+The repository holds both halves: the Nuxt frontend at the root, and the Laravel
+API in `backend/`. See [backend-local.md](backend-local.md) to run the API.
 
 ## Goals
 
@@ -16,6 +22,7 @@
 | Layer | Technology |
 |-------|-----------|
 | Framework | Nuxt 3 |
+| Backend API | Laravel 12 + MySQL 8.4 (`backend/`) |
 | Language | TypeScript |
 | Styling | Tailwind CSS v3 |
 | State Management | Pinia |
@@ -24,13 +31,16 @@
 | Icons | @nuxt/icon + @heroicons/vue |
 | Images | @nuxt/image |
 | Fonts | @nuxtjs/google-fonts |
-| SEO | @nuxtjs/sitemap |
+| SEO | @nuxtjs/sitemap + `useSeo` / `useJsonLd` (see [seo.md](seo.md)) |
 | UI Primitives | @headlessui/vue |
 | Slider | Swiper |
-| Auth | jose (JWT) |
+| Auth | JWT issued by Laravel, held in an HTTP-only cookie |
 | Linting | ESLint (@antfu/eslint-config) |
 | Formatting | Prettier + prettier-plugin-tailwindcss |
 | Git Hooks | Husky + lint-staged |
+
+> `jose` and `firebase` appear in `package.json` but are not imported anywhere
+> in the frontend. Leftovers from an earlier auth approach — safe to remove.
 
 ## Scripts
 
