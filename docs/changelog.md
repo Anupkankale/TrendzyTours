@@ -5,6 +5,40 @@ survives past the diff.
 
 ---
 
+## Open issues
+
+| Issue | Impact | Where |
+|-------|--------|-------|
+| **Dashboard role gate is inactive** — pages nest roles under `meta:`, middleware reads them top-level | Any authenticated user reaches every dashboard page | [middleware.md](middleware.md) |
+| Listing pages render zero tours server-side | `/holidays/**`, `/destinations/**` serve empty pages to crawlers | [seo.md](seo.md) |
+| No 1200×630 Open Graph image | Static-page link previews show a letterboxed logo | [seo.md](seo.md) |
+| `jose` and `firebase` in `package.json` but unused | Dead dependencies | [overview.md](overview.md) |
+
+---
+
+## Documentation accuracy pass
+
+`docs: correct drift across the documentation set`
+
+Audited every doc against the code. The docs described an earlier architecture
+and had drifted substantially:
+
+| Doc | Was wrong |
+|-----|-----------|
+| `composables.md` | `useTours` described as a Pinia wrapper returning `filteredTours`/`setFilter`; it uses `useAsyncData` and returns `{ tours, pending, error }`. `useApi` undocumented. Contact form's OTP flow unmentioned |
+| `pages.md` | Documented a `/tours` index route backed by `pages/tours/index.vue` — neither exists. ~15 real routes missing |
+| `ai-context.md` | Listed seven Nuxt `server/api/` endpoints that do not exist; the API is Laravel in `backend/` |
+| `architecture.md` | Labelled `server/` "Nitro server routes / API"; it holds only the sitemap source |
+| `stores.md` | `bookings` and `leads` stores missing entirely; `tours.tours` and `fetchTours()` don't exist (`tourList`, dashboard CRUD do); `ui.toggleMobileMenu()` doesn't exist |
+| `components.md` | `TourForm` and `AppOtpInput` missing; `AppBadge` prop listed as `color`, actually `variant` |
+| `overview.md` | Auth credited to `jose`, which isn't imported anywhere |
+| `middleware.md` | `role.ts` said to redirect to `/`; it redirects to `/dashboard`, and admins bypass entirely |
+
+Verifying `middleware.md` surfaced the role-gate bug listed under **Open
+issues** above.
+
+---
+
 ## `fix/tour-card-and-technical-seo`
 
 Three related pieces of work: a broken image, a card quality pass, and the

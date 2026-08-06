@@ -23,20 +23,30 @@
 
 | Component | Description |
 |-----------|-------------|
-| `TourCard.vue` | Card UI for a single tour (image, title, price, badge) |
+| `TourCard.vue` | Card for a single tour — image, title, price, duration badge, wishlist toggle |
 | `TourGrid.vue` | Responsive grid that renders multiple `TourCard` components |
+
+`TourCard` uses a single stretched link (the whole card is clickable, one tab
+stop) and falls back to a branded placeholder if the hero image fails to load.
+It shows real `groupSize` data, not a rating — the `Tour` type has no rating
+field.
 
 ## Dashboard (`components/dashboard/`)
 
 | Component | Description |
 |-----------|-------------|
 | `DashHeader.vue` | Top bar for the dashboard layout |
-| `DashSidebar.vue` | Side navigation for dashboard sections |
+| `DashSidebar.vue` | Role-aware side navigation |
+| `TourForm.vue` | Shared create/edit tour form |
+
+`TourForm` props: `initialValue?: TourFormInput`, `submitting?: boolean`,
+`submitLabel?: string` (defaults to `"Save Tour"`).
 
 ## UI Primitives (`components/ui/`)
 
 | Component | Props | Description |
 |-----------|-------|-------------|
-| `AppButton.vue` | `variant`, `size`, etc. | Reusable button with style variants |
-| `AppBadge.vue` | `label`, `color` | Small label/tag badge |
-| `AppSectionTitle.vue` | `title`, `subtitle` | Consistent section heading block |
+| `AppButton.vue` | `variant` (`primary`/`secondary`/`outline`/`ghost`), `size` (`sm`/`md`/`lg`), `href`, `disabled`, `loading`, `iconRight` | Button; renders as a link when `href` is set |
+| `AppBadge.vue` | `label`, `variant` (`brand`/`dark`/`green`) | Small label/tag badge |
+| `AppSectionTitle.vue` | `title`, `subtitle`, `eyebrow`, `center`, `light` | Consistent section heading block |
+| `AppOtpInput.vue` | `status` (`idle`/`verifying`/`verified`/`wrong`) | 6-digit OTP entry; emits `complete` and `reset` |
