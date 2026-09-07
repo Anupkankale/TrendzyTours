@@ -1,0 +1,37 @@
+{
+  "name": "trendzy-tours-api",
+  "version": "1.0.0",
+  "description": "Trendzy Tours REST API — Node.js + Express + MongoDB (port of the Laravel backend)",
+  "private": true,
+  "type": "module",
+  "main": "server.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "seed": "node scripts/seed.js",
+    "migrate": "node scripts/migrate-from-mysql.js",
+    "test": "node --import ./tests/setup.js --test \"tests/**/*.test.js\"",
+    "parity": "bash tests/parity/compare.sh"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.20.1",
+    "zod": "^4.1.13"
+  },
+  "devDependencies": {
+    "mongodb-memory-server": "^11.2.0",
+    "mysql2": "^3.15.3",
+    "nodemon": "^3.1.10",
+    "supertest": "^7.2.2"
+  }
+}
