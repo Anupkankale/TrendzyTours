@@ -16,5 +16,6 @@ Welcome to the Trendzy Tours documentation. This folder contains all project doc
 | [styling.md](styling.md) | Tailwind CSS conventions and design tokens |
 | [seo.md](seo.md) | Technical SEO — meta, structured data, sitemap, robots |
 | [setup.md](setup.md) | Local development setup guide |
+| [deployment.md](deployment.md) | Step-by-step production deployment — Vercel, Hostinger, Atlas, DNS, TLS |
 | [backend-local.md](backend-local.md) | Short local quickstart for running the Laravel backend |
 | [changelog.md](changelog.md) | Notable changes and the reasoning behind them |
