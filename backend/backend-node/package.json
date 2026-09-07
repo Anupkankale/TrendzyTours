@@ -1,7 +1,7 @@
 {
   "name": "trendzy-tours-api",
   "version": "1.0.0",
-  "description": "Trendzy Tours REST API — Node.js + Express + MongoDB (port of the Laravel backend)",
+  "description": "Trendzy Tours REST API \u2014 Node.js + Express + MongoDB (port of the Laravel backend)",
   "private": true,
   "type": "module",
   "main": "server.js",
@@ -10,6 +10,7 @@
   },
   "scripts": {
     "start": "node server.js",
+    "build": "echo 'No build step: pure ESM, runs from source.'",
     "dev": "nodemon server.js",
     "seed": "node scripts/seed.js",
     "migrate": "node scripts/migrate-from-mysql.js",

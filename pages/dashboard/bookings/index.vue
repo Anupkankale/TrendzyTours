@@ -230,115 +230,115 @@ async function submitBooking() {
         </tbody>
       </table>
     </div>
-  </div>
 
-  <!-- New Booking Modal -->
-  <Teleport to="body">
-    <div
-      v-if="showModal"
-      class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-dark-950/40 backdrop-blur-sm p-4 pt-16"
-      @click.self="closeModal">
-      <div class="w-full max-w-xl rounded-2xl bg-white p-6 shadow-xl">
-        <h2 class="font-heading text-xl font-bold text-dark-900">New Booking</h2>
-        <p class="mt-0.5 text-sm text-dark-400">Create a manual booking from a call, reference, or walk-in.</p>
+    <!-- New Booking Modal -->
+    <Teleport to="body">
+      <div
+        v-if="showModal"
+        class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-dark-950/40 backdrop-blur-sm p-4 pt-16"
+        @click.self="closeModal">
+        <div class="w-full max-w-xl rounded-2xl bg-white p-6 shadow-xl">
+          <h2 class="font-heading text-xl font-bold text-dark-900">New Booking</h2>
+          <p class="mt-0.5 text-sm text-dark-400">Create a manual booking from a call, reference, or walk-in.</p>
 
-        <div class="mt-5 space-y-4">
-          <!-- Tour -->
-          <div>
-            <label class="booking-label">Tour *</label>
-            <select v-model="form.tourId" class="booking-input">
-              <option value="" disabled>Select a tour…</option>
-              <option
-                v-for="tour in bookingsStore.tourOptions"
-                :key="tour.id"
-                :value="tour.id">
-                {{ tour.name }} — {{ tour.destination }}
-              </option>
-            </select>
-          </div>
-
-          <!-- Customer Name + Phone -->
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div class="mt-5 space-y-4">
+            <!-- Tour -->
             <div>
-              <label class="booking-label">Customer Name *</label>
-              <input v-model="form.customerName" type="text" placeholder="Full name" class="booking-input" />
-            </div>
-            <div>
-              <label class="booking-label">Phone *</label>
-              <input v-model="form.customerPhone" type="tel" placeholder="Mobile number" class="booking-input" />
-            </div>
-          </div>
-
-          <!-- Email -->
-          <div>
-            <label class="booking-label">Email *</label>
-            <input v-model="form.customerEmail" type="email" placeholder="customer@email.com" class="booking-input" />
-          </div>
-
-          <!-- Travel Date + Adults + Children -->
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div class="sm:col-span-1">
-              <label class="booking-label">Travel Date *</label>
-              <input v-model="form.travelDate" type="date" class="booking-input" />
-            </div>
-            <div>
-              <label class="booking-label">Adults *</label>
-              <input v-model.number="form.adults" type="number" min="1" class="booking-input" />
-            </div>
-            <div>
-              <label class="booking-label">Children</label>
-              <input v-model.number="form.children" type="number" min="0" class="booking-input" />
-            </div>
-          </div>
-
-          <!-- Source + Initial Status -->
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label class="booking-label">Source *</label>
-              <select v-model="form.source" class="booking-input">
-                <option v-for="opt in sourceOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+              <label class="booking-label">Tour *</label>
+              <select v-model="form.tourId" class="booking-input">
+                <option value="" disabled>Select a tour…</option>
+                <option
+                  v-for="tour in bookingsStore.tourOptions"
+                  :key="tour.id"
+                  :value="tour.id">
+                  {{ tour.name }} — {{ tour.destination }}
+                </option>
               </select>
             </div>
-            <div>
-              <label class="booking-label">Initial Status</label>
-              <select v-model="form.status" class="booking-input">
-                <option value="pending">Pending</option>
-                <option value="confirmed">Confirmed</option>
-              </select>
+
+            <!-- Customer Name + Phone -->
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label class="booking-label">Customer Name *</label>
+                <input v-model="form.customerName" type="text" placeholder="Full name" class="booking-input" />
+              </div>
+              <div>
+                <label class="booking-label">Phone *</label>
+                <input v-model="form.customerPhone" type="tel" placeholder="Mobile number" class="booking-input" />
+              </div>
             </div>
+
+            <!-- Email -->
+            <div>
+              <label class="booking-label">Email *</label>
+              <input v-model="form.customerEmail" type="email" placeholder="customer@email.com" class="booking-input" />
+            </div>
+
+            <!-- Travel Date + Adults + Children -->
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div class="sm:col-span-1">
+                <label class="booking-label">Travel Date *</label>
+                <input v-model="form.travelDate" type="date" class="booking-input" />
+              </div>
+              <div>
+                <label class="booking-label">Adults *</label>
+                <input v-model.number="form.adults" type="number" min="1" class="booking-input" />
+              </div>
+              <div>
+                <label class="booking-label">Children</label>
+                <input v-model.number="form.children" type="number" min="0" class="booking-input" />
+              </div>
+            </div>
+
+            <!-- Source + Initial Status -->
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label class="booking-label">Source *</label>
+                <select v-model="form.source" class="booking-input">
+                  <option v-for="opt in sourceOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+                </select>
+              </div>
+              <div>
+                <label class="booking-label">Initial Status</label>
+                <select v-model="form.status" class="booking-input">
+                  <option value="pending">Pending</option>
+                  <option value="confirmed">Confirmed</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Message -->
+            <div>
+              <label class="booking-label">Notes / Special Requests</label>
+              <textarea
+                v-model="form.message"
+                rows="3"
+                placeholder="Any special requirements, reference name, remarks…"
+                class="booking-input resize-none" />
+            </div>
+
+            <!-- Error -->
+            <p v-if="formError" class="text-sm text-red-600">{{ formError }}</p>
           </div>
 
-          <!-- Message -->
-          <div>
-            <label class="booking-label">Notes / Special Requests</label>
-            <textarea
-              v-model="form.message"
-              rows="3"
-              placeholder="Any special requirements, reference name, remarks…"
-              class="booking-input resize-none" />
+          <!-- Actions -->
+          <div class="mt-6 flex justify-end gap-3">
+            <button
+              class="rounded-xl border border-dark-200 px-4 py-2 text-sm font-medium text-dark-600 transition hover:bg-dark-50"
+              @click="closeModal">
+              Cancel
+            </button>
+            <button
+              class="rounded-xl bg-brand-500 px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-600 disabled:opacity-50"
+              :disabled="submitting"
+              @click="submitBooking">
+              {{ submitting ? "Creating…" : "Create Booking" }}
+            </button>
           </div>
-
-          <!-- Error -->
-          <p v-if="formError" class="text-sm text-red-600">{{ formError }}</p>
-        </div>
-
-        <!-- Actions -->
-        <div class="mt-6 flex justify-end gap-3">
-          <button
-            class="rounded-xl border border-dark-200 px-4 py-2 text-sm font-medium text-dark-600 transition hover:bg-dark-50"
-            @click="closeModal">
-            Cancel
-          </button>
-          <button
-            class="rounded-xl bg-brand-500 px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-600 disabled:opacity-50"
-            :disabled="submitting"
-            @click="submitBooking">
-            {{ submitting ? "Creating…" : "Create Booking" }}
-          </button>
         </div>
       </div>
-    </div>
-  </Teleport>
+    </Teleport>
+  </div>
 </template>
 
 <style scoped>

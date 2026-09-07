@@ -55,9 +55,20 @@ ESLint uses `@antfu/eslint-config`. Husky runs lint-staged on pre-commit to enfo
 
 ## Environment Variables
 
-Create a `.env` file at the project root for any required secrets (e.g., API keys, JWT secret). Nuxt reads these automatically via `useRuntimeConfig()`.
+Copy `.env.example` to `.env` at the project root. Nuxt exposes these through
+`useRuntimeConfig().public`.
 
 ```env
-# Example
-NUXT_JWT_SECRET=your-secret-here
+# Absolute origin of the API. Leave empty locally so nitro.devProxy forwards
+# /api/** to the backend on localhost instead.
+NUXT_PUBLIC_API_BASE=
+
+# Canonical site origin. Drives canonicals, og:url and the sitemap; without it
+# these emit localhost.
+NUXT_PUBLIC_SITE_URL=https://trendzytours.com
+
+WHATSAPP_NUMBER=91XXXXXXXXXX
 ```
+
+The frontend holds no secrets — auth, email and the database all live behind
+the API. See [deployment.md](./deployment.md) for the production values.

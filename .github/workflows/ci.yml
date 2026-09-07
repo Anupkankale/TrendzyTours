@@ -1,0 +1,67 @@
+name: CI
+
+# Deploys are handled by the platforms themselves: Vercel builds the Nuxt app
+# from this repo's root, Hostinger Web Apps builds the API from
+# backend/backend-node. This workflow is the quality gate that runs before
+# either of them ships anything.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: Frontend checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      # Catches build-time breakage before Vercel does, without needing the
+      # API: NUXT_PUBLIC_API_BASE is left unset, so the sitemap source falls
+      # back to the data/tours.ts seed by design.
+      - name: Build
+        env:
+          NUXT_PUBLIC_SITE_URL: https://trendzytours.com
+        run: npm run build
+
+  backend:
+    name: API checks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/backend-node
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: backend/backend-node/package-lock.json
+
+      - run: npm ci
+
+      # 106 tests over node:test + supertest against an in-memory MongoDB.
+      # tests/setup.js pins env, so the suite can never reach real Atlas or
+      # send real email.
+      - name: Tests
+        run: npm test

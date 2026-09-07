@@ -1,0 +1,5 @@
+# Vercel builds only the Nuxt app at the repo root. The Laravel app and the
+# Node API deploy elsewhere (Hostinger Web Apps) and would otherwise be cloned
+# into every build for nothing.
+backend
+docs

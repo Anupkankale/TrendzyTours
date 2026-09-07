@@ -12,6 +12,12 @@ const schema = z.object({
 
 export type ContactFormValues = z.infer<typeof schema>
 
+/** The subset of ofetch's FetchError this composable actually reads. */
+interface FetchLikeError {
+  data?: { message?: string }
+  response?: { status?: number, _data?: { message?: string } }
+}
+
 export function useContactForm() {
   const { apiFetch } = useApi()
 
@@ -64,7 +70,7 @@ export function useContactForm() {
       })
       otpSent.value = true
     } catch (err: unknown) {
-      const status = (err as any)?.response?.status
+      const status = (err as FetchLikeError)?.response?.status
       if (status === 429) {
         verifyError.value = "Too many requests. Please wait 10 minutes before trying again."
       } else {
@@ -90,7 +96,8 @@ export function useContactForm() {
       otpStatus.value = "verified"
     } catch (err: unknown) {
       otpStatus.value = "wrong"
-      const data = (err as any)?.data ?? (err as any)?.response?._data
+      const fetchErr = err as FetchLikeError
+      const data = fetchErr?.data ?? fetchErr?.response?._data
       const msg = data?.message ?? (err instanceof Error ? err.message : "Invalid OTP. Please try again.")
       verifyError.value = msg
       if (msg?.toLowerCase().includes("expired")) {

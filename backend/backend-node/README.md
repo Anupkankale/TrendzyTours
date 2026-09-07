@@ -244,7 +244,9 @@ tests/
 ## Deploying to Hostinger Web Apps
 
 1. Push this directory to GitHub and point a Hostinger Web App at it.
-2. Node 20+, install command `npm ci`, start command `node server.js`.
+2. Node 20+, install command `npm ci`, build command `npm run build`, start
+   command `npm start`. Hostinger always runs a build step; `build` is a
+   deliberate no-op here because the app is pure ESM and compiles nothing.
 3. Set the environment variables from the table above in the Hostinger panel —
    `NODE_ENV=production`, `COOKIE_SECURE=true`,
    `COOKIE_DOMAIN=.trendzytours.com`, `FRONTEND_URL=https://trendzytours.com`,

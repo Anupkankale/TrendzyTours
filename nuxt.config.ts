@@ -95,10 +95,14 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    "/": { prerender: true },
+    // isr is native to the Vercel preset we deploy under. Keep it rather than
+    // swr: swr only reaches Vercel through a deprecated back-compat path.
+    // `/` and `/holidays/**` are revalidated rather than prerendered so a tour
+    // published from the dashboard appears without waiting for a redeploy.
+    "/": { isr: 900 },
     "/about": { prerender: true },
     "/contact": { prerender: true },
-    "/holidays/**": { prerender: true },
+    "/holidays/**": { isr: 900 },
     "/destinations/**": { isr: 3600 },
     "/tours/**": { isr: 3600 },
     "/blog/**": { isr: 1800 },

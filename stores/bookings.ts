@@ -27,7 +27,9 @@ export const useBookingsStore = defineStore("bookings", () => {
     try {
       const tours = await apiFetch<TourOption[]>("/api/tours")
       tourOptions.value = tours
-    } catch {}
+    } catch {
+      // Non-fatal: the tour dropdown stays empty rather than blocking the page.
+    }
   }
 
   async function createBooking(data: {
