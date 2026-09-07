@@ -41,7 +41,7 @@ Domain: trendzytours.com | Location: Nagpur, India.
 pages/
   index.vue              # Home
   about.vue
-  contact.vue            # Form + OTP email verification
+  contact.vue            # Contact form
   login.vue
   terms.vue
   privacy-policy.vue
@@ -67,7 +67,7 @@ stores/
 
 composables/
   useApi.ts              # $fetch wrapper — baseURL, cookies, Accept: json
-  useContactForm.ts      # Contact form + OTP flow (vee-validate + zod)
+  useContactForm.ts      # Contact form (vee-validate + zod)
   useNewsletterForm.ts   # Newsletter signup (zod only)
   useTours.ts            # useTours(filters) / useTour(slug) via useAsyncData
   useSeo.ts              # Title, description, canonical, OG, Twitter
@@ -99,8 +99,7 @@ compose). The only Nitro server route is the sitemap source above.
 |----------|---------|
 | `GET /api/tours` | List; supports `?category=`, `?region=`, `?featured=` |
 | `GET /api/tours/{slug}` | Tour detail |
-| `POST /api/contact` | Contact form (requires a verified `emailToken`) |
-| `POST /api/otp/send`, `/api/otp/verify` | Email verification |
+| `POST /api/contact` | Contact form (public, rate limited) |
 | `POST /api/newsletter` | Brevo signup |
 | `POST /api/auth/login`, `/logout` · `GET /api/auth/me` | JWT session |
 | `GET/POST/PUT/DELETE /api/admin/tours` | Dashboard tour CRUD |

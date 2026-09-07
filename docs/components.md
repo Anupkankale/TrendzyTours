@@ -49,4 +49,3 @@ field.
 | `AppButton.vue` | `variant` (`primary`/`secondary`/`outline`/`ghost`), `size` (`sm`/`md`/`lg`), `href`, `disabled`, `loading`, `iconRight` | Button; renders as a link when `href` is set |
 | `AppBadge.vue` | `label`, `variant` (`brand`/`dark`/`green`) | Small label/tag badge |
 | `AppSectionTitle.vue` | `title`, `subtitle`, `eyebrow`, `center`, `light` | Consistent section heading block |
-| `AppOtpInput.vue` | `status` (`idle`/`verifying`/`verified`/`wrong`) | 6-digit OTP entry; emits `complete` and `reset` |

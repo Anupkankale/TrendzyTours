@@ -1,6 +1,5 @@
 import { Router } from "express"
 import authRoutes from "./auth.routes.js"
-import otpRoutes from "./otp.routes.js"
 import toursRoutes from "./tours.routes.js"
 import adminToursRoutes from "./adminTours.routes.js"
 import leadsRoutes from "./leads.routes.js"
@@ -9,8 +8,7 @@ import contactRoutes from "./contact.routes.js"
 
 const router = Router()
 
-// Mirrors backend/routes/api.php, in the same order.
-router.use("/otp", otpRoutes)
+// Mirrors backend/routes/api.php, minus the removed OTP endpoints.
 router.use("/tours", toursRoutes)
 router.use("/", contactRoutes)
 router.use("/auth", authRoutes)

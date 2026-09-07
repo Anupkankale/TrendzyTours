@@ -22,7 +22,7 @@ trendzytours.com           api.trendzytours.com
 | Auth | `jsonwebtoken` (HS256) in an httpOnly cookie, `bcryptjs` |
 | Validation | zod, translated into Laravel-shaped 422 bodies |
 | Email | Brevo transactional API |
-| Hardening | helmet, CORS allow-list, login rate limit |
+| Hardening | helmet, CORS allow-list, login + contact rate limits |
 
 ## Setup
 
@@ -60,8 +60,7 @@ docker run -d --name trendzy-mongo-dev -p 27017:27017 mongo:7
 | `FRONTEND_URL` | CORS allow-list; comma-separated for several origins. |
 | `COOKIE_DOMAIN` | Blank locally; `.trendzytours.com` in production so the cookie is shared with the API subdomain. |
 | `COOKIE_SAMESITE` / `COOKIE_SECURE` | `lax` / `true` in production. Only go `none` + `secure` if the frontend ends up on a different registrable domain. |
-| `OTP_REQUIRED` | Whether `/api/contact` demands an OTP-verified email. Defaults to **true**; set `false` to accept submissions without verification. |
-| `BREVO_*` | Transactional email and newsletter list. |
+| `BREVO_*` | Optional. Lead notification and newsletter sync are skipped when unset; the contact form still records the lead. |
 | `MYSQL_*` | Only read by `scripts/migrate-from-mysql.js`. |
 
 ## Routes
@@ -71,7 +70,6 @@ Identical to `../routes/api.php`.
 | Method | Path | Guard |
 |---|---|---|
 | GET | `/` , `/up` | — (health) |
-| POST | `/api/otp/send`, `/api/otp/verify` | public |
 | GET | `/api/tours`, `/api/tours/:slug` | public, published only |
 | POST | `/api/contact`, `/api/newsletter` | public |
 | POST | `/api/auth/login`, `/api/auth/logout` | public |
@@ -85,18 +83,21 @@ Identical to `../routes/api.php`.
 
 `GET /api/tours` accepts `category`, `region` and `featured` query filters.
 
-### Contact-form verification
+### Contact form
 
-By default `/api/contact` requires an `emailToken` from `/api/otp/verify`, for
-the same address — the Laravel behaviour. Setting `OTP_REQUIRED=false` makes the
-token optional: `/api/otp/send` and `/api/otp/verify` keep working, a valid
-token is still consumed so it cannot be replayed, and everything else on the
-payload is still validated. Only the *requirement* goes away.
+`POST /api/contact` is public and takes the form fields alone. The email OTP
+that used to gate it — `/api/otp/send`, `/api/otp/verify` and an `emailToken`
+on the payload — has been removed, along with the `OtpVerification` model and
+the `OTP_REQUIRED` flag.
 
-> The Nuxt contact form also refuses to submit until it holds a token
-> (`composables/useContactForm.ts`), so turning the flag off unblocks the API
-> but not yet the UI. The frontend needs a matching switch before the form can
-> be completed without a code.
+That removed the only hard dependency on Brevo: without `BREVO_API_KEY` the
+lead is still recorded and only the notification email is skipped. An
+`emailToken` sent by a cached frontend build is ignored rather than rejected,
+so an old bundle keeps working.
+
+Because OTP was also the de-facto spam gate, `/api/contact` and
+`/api/newsletter` are now rate limited to 10 requests per hour per IP
+(`contactLimiter` in `src/middleware/rateLimit.js`).
 
 Creating a lead, booking or tour answers **201**; everything else answers 200.
 Validation failures answer **422** with `{ message, errors: { field: [...] } }`,
@@ -117,11 +118,6 @@ MongoDB collapses four MySQL tables into two documents:
 `_id`s**, so migrated rows keep their ids, existing tour URLs keep working and
 the frontend's `uuid` validation on `tourId` still holds.
 
-`otp_verifications` gains a 24-hour TTL index on `createdAt` (Laravel never
-purged those rows). The TTL deliberately does *not* hang off `expiresAt`: a
-verified `email_token` has to outlive the 10-minute OTP window, because the
-contact form is submitted after it.
-
 ## Migrating from MySQL
 
 ```bash
@@ -130,8 +126,8 @@ npm run migrate                # upsert by _id — safe to re-run
 ```
 
 Preserves UUIDs, timestamps, statuses and bcrypt password hashes, and folds the
-gallery, itinerary and lead-note tables into their parents. `otp_verifications`
-is skipped — those rows expire within ten minutes.
+gallery, itinerary and lead-note tables into their parents. Laravel's
+`otp_verifications` table is skipped — the OTP feature no longer exists here.
 
 Set `MYSQL_HOST/PORT/DATABASE/USER/PASSWORD` first. Timestamps are read as UTC
 because `../config/app.php` pins the Laravel app to UTC (the
@@ -164,9 +160,9 @@ cluster or send real email even if your `.env` is populated.
 | `integration/adminTours` | 201 on create, embedded gallery/itinerary round-trip, slug uniqueness ignoring self, partial update, delete guarded by bookings |
 | `integration/leads` | manual source forced, note authorship, accumulation order, the 400 for an empty update |
 | `integration/bookings` | 201 on create, defaults, numeric strings from the form, unknown tour, past travel date, populated tour after update |
-| `integration/otpContact` | expiry window, per-email throttle, single-use codes and tokens, email mismatch, lead creation |
-| `integration/otpDisabled` | `OTP_REQUIRED=false`: submissions without a token, tokens still consumed, the rest of the payload still validated |
+| `integration/contact` | submission without verification, a stale `emailToken` ignored, optional `tourInterest`, required-field errors, no lead written on failure, the removed OTP routes answering 404, newsletter validation |
 | `integration/loginThrottle` | that only *failed* logins consume the budget |
+| `integration/contactThrottle` | the 10/hour contact budget, that a refused request writes no lead, and that newsletter shares the budget |
 
 The `$2y$` fixtures in `tests/helpers/factories.js` were produced by PHP's
 `password_hash(…, PASSWORD_BCRYPT, ['cost' => 12])` — byte for byte what
@@ -193,10 +189,11 @@ cd backend/backend-node && npm run seed && npm run dev &
 npm run parity
 ```
 
-Both databases must be freshly seeded, and the Node server must run with
-`OTP_REQUIRED=true` — Laravel always demanded the token, so the harness's
-contact cases assume it. Ids and timestamps generated by the seeders are
-blanked before diffing; everything else must match byte for byte.
+Both databases must be freshly seeded. Ids and timestamps generated by the
+seeders are blanked before diffing; everything else must match byte for byte.
+The OTP cases and the `emailToken` rule on `/api/contact` were dropped from the
+harness — Laravel still has them and this port does not, so they would compare
+two different feature sets.
 
 Last run: **41 cases pass, 0 fail, 3 differences by design.**
 
@@ -210,8 +207,8 @@ the Laravel backend alive to run at all.
 | 404 body | `No query results for model [App\Models\Tour] <id>` | `{"message":"Not found"}` | Echoing a PHP class name from a Node service is meaningless and leaks internals. Status codes match; no frontend code reads the text. |
 | Unknown route | `The route api/x could not be found.` | `{"message":"Not found"}` | Same reasoning. |
 | Login throttle | none | 30 failed attempts / 15 min / IP | Brute-force protection. Successful logins are not counted, so normal use — including several people behind one office IP — is unaffected. |
-| OTP delivery | `Mail::html` via the `log` mailer, so nothing was ever delivered | Brevo transactional API | The old configuration silently dropped every OTP email. Without `BREVO_API_KEY` the code is printed to the console in development and the request fails in production, rather than pretending to have sent. |
-| Spent OTP rows | kept forever | 24-hour TTL index | Housekeeping. |
+| Contact throttle | none | 10 requests / hour / IP | Replaces the removed OTP as the spam gate on a public endpoint. |
+| Contact OTP | `email_token` from `/api/otp/*` required | removed | The OTP mail made `BREVO_API_KEY` a hard launch dependency: without it `/api/otp/send` failed and the form could not be submitted at all. Verification bought little on an enquiry form and cost every visitor an extra step. |
 | Logout | server-side token invalidation | clears the cookie | JWTs are stateless here; a stolen token stays valid until it expires. Keep `JWT_TTL` short if that matters, or add a deny-list. |
 
 One known cosmetic gap: when `groupSize` is present but a *nested* itinerary day
@@ -249,8 +246,7 @@ tests/
    deliberate no-op here because the app is pure ESM and compiles nothing.
 3. Set the environment variables from the table above in the Hostinger panel —
    `NODE_ENV=production`, `COOKIE_SECURE=true`,
-   `COOKIE_DOMAIN=.trendzytours.com`, `FRONTEND_URL=https://trendzytours.com`,
-   and `OTP_REQUIRED` to match whatever the frontend expects.
+   `COOKIE_DOMAIN=.trendzytours.com` and `FRONTEND_URL=https://trendzytours.com`.
 4. Allow Hostinger's egress IPs in the MongoDB Atlas network access list.
 5. Map `api.trendzytours.com` to the app.
 6. Run the migration once against Atlas, then set

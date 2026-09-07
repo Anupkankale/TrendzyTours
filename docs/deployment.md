@@ -49,8 +49,7 @@ FRONTEND_URL=https://trendzytours.com
 COOKIE_DOMAIN=.trendzytours.com
 COOKIE_SAMESITE=lax
 COOKIE_SECURE=true
-OTP_REQUIRED=true
-BREVO_API_KEY=<required>
+BREVO_API_KEY=<optional>
 BREVO_LIST_ID=<newsletter list id>
 BREVO_SENDER_EMAIL=noreply@trendzytours.com
 BREVO_NOTIFY_EMAIL=<inbox that receives leads>
@@ -60,10 +59,11 @@ BREVO_NOTIFY_EMAIL=<inbox that receives leads>
 so a missing variable shows up as an app that will not start rather than as a
 broken request later.
 
-> **`BREVO_API_KEY` is a launch blocker for the contact form.**
-> `src/services/brevoService.js` returns `false` when the key is absent, which
-> in production fails `/api/otp/send`; the Nuxt form refuses to submit without
-> a verified token. No key means nobody can contact the business.
+Brevo is **optional**. Without a key the lead notification email and the
+newsletter sync are skipped silently and the contact form still records the
+lead. It used to be a hard launch blocker via the email OTP; that feature was
+removed, and `/api/contact` is rate limited instead (10 requests per hour per
+IP).
 
 ### MongoDB Atlas
 
@@ -240,13 +240,14 @@ cookies:
    CORS plus `credentials: "include"` across the subdomain.
 4. Log out; the cookie clears and `/dashboard` redirects.
 
-**Contact form, end to end** — the piece that dies silently without
-`BREVO_API_KEY`:
+**Contact form, end to end:**
 
-1. Submit the form with a real address.
-2. The OTP email arrives, the code verifies, the submission is accepted.
-3. The notification lands at `BREVO_NOTIFY_EMAIL` and the lead appears in the
-   dashboard.
+1. Submit the form. It should accept immediately — there is no verification
+   step.
+2. The lead appears in the dashboard under Leads.
+3. If `BREVO_API_KEY` is set, the notification lands at `BREVO_NOTIFY_EMAIL`.
+   If it is not, the lead is still recorded — that is expected, not a failure.
+4. Submit eleven times in an hour from one IP; the eleventh should answer 429.
 
 ---
 
@@ -258,7 +259,7 @@ Decisions, not surprises. None blocks launch.
 |---|---|---|
 | Hard refresh on `/dashboard` bounces to `/login` | `stores/auth.ts`, `middleware/auth.ts` | Auth state is in-memory with no bootstrap, and `/dashboard/**` is `ssr: false`. A staff annoyance, not a hole — Express enforces the real guard. |
 | No pagination on `/api/leads`, `/api/bookings`, `/api/admin/tours` | `backend/backend-node/src/controllers/` | Whole collection per request. Fine now; revisit as bookings accumulate. |
-| Only login is rate-limited | `src/middleware/rateLimit.js` | `/api/contact`, `/api/newsletter`, `/api/otp/send` are public and IP-unthrottled. Spam exposure once indexed. |
+| Contact spam relies on rate limiting alone | `src/middleware/rateLimit.js` | With the OTP gone, `contactLimiter` (10/hour/IP) is the only guard on `/api/contact` and `/api/newsletter`. A distributed bot would get past it; add a captcha if that starts happening. |
 | Lead notification email interpolates user input unescaped | `src/services/brevoService.js` | HTML injection into the internal mail. Low severity, worth fixing. |
 | Stateless logout | by design | A stolen JWT stays valid up to `JWT_TTL` (7 days). |
 | Laravel backend still in the repo, undeployed | `backend/` | Intentional. Decide whether to delete once the production walkthrough passes. |

@@ -63,17 +63,13 @@ const { tour } = useTour("rajasthan-royal-10-nights")
 
 ## `useContactForm.ts`
 
-Contact page form, including an OTP email-verification step. **The form cannot
-be submitted until the email address is verified** — `submit()` refuses without a
-valid `emailToken`.
+Contact page form. Submits straight to `POST /api/contact`; the email OTP step
+that used to gate this was removed, and the endpoint is rate limited server-side
+instead.
 
 - **VeeValidate** + **Zod** validation over `name`, `email`, `phone`,
   `tourInterest` (optional), `message`
 - Fields are exposed as `defineField` pairs — e.g. `name` and `nameProps`
-- Changing the email resets the verification state
-- `POST /api/otp/send` → `POST /api/otp/verify` → `POST /api/contact`
-- `sendOtp()` surfaces a specific message on HTTP 429 (rate limit); an expired
-  OTP auto-resets the flow so the user can request a new one
 
 **Returns:**
 
@@ -81,9 +77,6 @@ valid `emailToken`.
 |-------|--------|
 | Fields | `name`/`nameProps`, `email`/`emailProps`, `phone`/`phoneProps`, `tourInterest`/`tourInterestProps`, `message`/`messageProps`, `errors` |
 | Submission | `submit`, `isSubmitting`, `isSuccess`, `serverError` |
-| OTP | `sendOtp`, `verifyOtp`, `resendOtp`, `resetOtpStatus`, `otpSending`, `otpSent`, `otpStatus`, `emailVerified`, `verifyError` |
-
-`otpStatus` is `"idle" | "verifying" | "verified" | "wrong"`.
 
 **Usage:**
 ```vue
@@ -91,7 +84,6 @@ valid `emailToken`.
 const {
   name, nameProps, email, emailProps, errors,
   submit, isSubmitting, isSuccess, serverError,
-  sendOtp, verifyOtp, otpSent, otpStatus, emailVerified,
 } = useContactForm()
 </script>
 ```

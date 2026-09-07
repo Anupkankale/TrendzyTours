@@ -143,10 +143,9 @@ echo
 echo "Validation and errors"
 compare "POST /api/newsletter (ok)"          POST "/api/newsletter" "" '{"email":"parity@example.com"}'
 compare "POST /api/newsletter (bad email)"   POST "/api/newsletter" "" '{"email":"nope"}'
-compare "POST /api/otp/verify (wrong)"       POST "/api/otp/verify" "" '{"email":"parity@example.com","otp":"123456"}'
-compare "POST /api/otp/verify (short otp)"   POST "/api/otp/verify" "" '{"email":"parity@example.com","otp":"12"}'
-compare "POST /api/contact (bad token)"      POST "/api/contact" "" '{"name":"Par Ity","email":"parity@example.com","phone":"9876543210","message":"A long enough message","emailToken":"bogus"}'
-compare "POST /api/contact (empty)"          POST "/api/contact" "" '{}'
+# /api/otp/* and the emailToken rule on /api/contact were removed here and
+# still exist in Laravel, so those cases would compare two different feature
+# sets. Contact validation is covered by tests/integration/contact.test.js.
 compare "POST /api/leads (empty)"            POST "/api/leads" sales '{}'
 compare "POST /api/bookings (empty)"         POST "/api/bookings" sales '{}'
 compare "POST /api/bookings (bad tour)"      POST "/api/bookings" sales '{"tourId":"11111111-2222-3333-4444-555555555555","customerName":"Ab","customerEmail":"a@b.co","customerPhone":"9876543210","travelDate":"2030-03-15","adults":1,"source":"call"}'

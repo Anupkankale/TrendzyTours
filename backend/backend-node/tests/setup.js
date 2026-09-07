@@ -14,9 +14,5 @@ process.env.FRONTEND_URL = "http://localhost:3000"
 process.env.COOKIE_DOMAIN = ""
 process.env.COOKIE_SAMESITE = "lax"
 process.env.COOKIE_SECURE = "false"
-// Pinned to the documented default so a developer's OTP_REQUIRED=false in .env
-// cannot silently weaken the suite. tests/integration/otpDisabled.test.js is
-// the one file that overrides it.
-process.env.OTP_REQUIRED = "true"
 process.env.BREVO_API_KEY = ""
 process.env.BREVO_LIST_ID = ""

@@ -48,10 +48,6 @@ export const env = {
     secure: bool(process.env.COOKIE_SECURE, false),
   },
 
-  // Email verification on the contact form. Defaults to on: turning it off is
-  // an explicit choice, never something a missing variable does silently.
-  otpRequired: bool(process.env.OTP_REQUIRED, true),
-
   brevo: {
     apiKey: process.env.BREVO_API_KEY || "",
     listId: process.env.BREVO_LIST_ID || "",

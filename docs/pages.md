@@ -8,7 +8,7 @@ All pages live under `pages/` and follow Nuxt 3 file-based routing.
 |-------|------|-------------|
 | `/` | `pages/index.vue` | Home — hero, featured tours, destinations, testimonials, offers |
 | `/about` | `pages/about.vue` | Agency story and values |
-| `/contact` | `pages/contact.vue` | Contact form with OTP email verification |
+| `/contact` | `pages/contact.vue` | Contact form |
 | `/login` | `pages/login.vue` | Login (`layout: false`, `noindex`) |
 | `/terms` | `pages/terms.vue` | Terms of service |
 | `/privacy-policy` | `pages/privacy-policy.vue` | Privacy policy |

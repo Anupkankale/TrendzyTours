@@ -13,7 +13,6 @@ import { Lead } from "../src/models/Lead.js"
 import { Booking } from "../src/models/Booking.js"
 import { Destination } from "../src/models/Destination.js"
 import { Testimonial } from "../src/models/Testimonial.js"
-import { OtpVerification } from "../src/models/OtpVerification.js"
 import { users } from "./data/users.js"
 import { tours } from "./data/tours.js"
 import { destinations } from "./data/destinations.js"
@@ -71,7 +70,6 @@ async function seed() {
     Booking.deleteMany({}),
     Destination.deleteMany({}),
     Testimonial.deleteMany({}),
-    OtpVerification.deleteMany({}),
   ])
 
   const hashedUsers = await Promise.all(

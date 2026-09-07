@@ -18,3 +18,20 @@ export const loginLimiter = rateLimit({
   legacyHeaders: false,
   message: { message: "Too many login attempts. Please try again later." },
 })
+
+/**
+ * The contact and newsletter endpoints are public, unauthenticated, and each
+ * accepted request writes a row and fires an email. The email OTP used to be
+ * the de-facto gate; with that removed, this is what stands between the form
+ * and a bot. The limit is high enough that a person retrying a failed
+ * submission never notices it.
+ */
+export const contactLimiter = rateLimit({
+  // Off under test unless a test opts in, the same arrangement loginLimiter uses.
+  skip: () => env.nodeEnv === "test" && process.env.TEST_CONTACT_LIMITER !== "1",
+  windowMs: 60 * 60 * 1000,
+  limit: 10,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: { message: "Too many submissions. Please try again later." },
+})
